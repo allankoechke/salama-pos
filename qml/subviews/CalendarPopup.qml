@@ -16,6 +16,9 @@ QQC2.Popup
 
     signal accepted(var date)
 
+    property alias maximumDate: calendar.maximumDate
+    property alias minimumDate: calendar.minimumDate
+
     background: Rectangle
     {
         color: bgColor

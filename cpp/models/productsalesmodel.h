@@ -49,6 +49,7 @@ public:
     Q_INVOKABLE void showThisWeeksSales();
     Q_INVOKABLE void showThisMonthsSales();
     Q_INVOKABLE void showThisYearsSales();
+    Q_INVOKABLE void showCustomDateSalesData(const QString& start, const QString& end);
     Q_INVOKABLE void getSalesSummary(const int &ind);
 
 

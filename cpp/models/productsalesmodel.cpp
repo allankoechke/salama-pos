@@ -386,6 +386,12 @@ void ProductSalesModel::showThisYearsSales()
     executeQuery(thisYearsDateRange);
 }
 
+void ProductSalesModel::showCustomDateSalesData(const QString &start, const QString &end)
+{
+    // Get sales done this year
+    executeQuery({start, end});
+}
+
 void ProductSalesModel::getSalesSummary(const int &ind)
 {
     Q_UNUSED(ind)
