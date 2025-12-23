@@ -395,25 +395,25 @@ void StockItemsModel::updateStockHistory(const QString &barcode, const int &stoc
     if(db.isOpen())
     {
         QSqlQuery query;
-        QString a,b;
-        a = QString::number(stock_qty_before);
-        b = QString::number(stock_qty_added);
+        QString sql = "INSERT INTO stock_history(barcode, stock_qty_before, stock_qty_added, date_updated, who_updated, is_adding) VALUES (:barcode, :stock_qty_before, :stock_qty_added, :date_updated, :who_updated, :is_adding)";
 
-        QString sql = "INSERT INTO stock_history(barcode, stock_qty_before, stock_qty_added, date_updated, who_updated, is_adding) VALUES (" +barcode+ ", "+a+", "+b+", '"+date_updated+"', '"+who_updated+"', '"+(is_adding? "True":"False")+"');";
+        query.prepare(sql);
+        query.bindValue(":barcode", barcode);
+        query.bindValue(":stock_qty_before", stock_qty_before);
+        query.bindValue(":stock_qty_added", stock_qty_added);
+        query.bindValue(":date_updated", date_updated.toString());
+        query.bindValue(":who_updated", who_updated.toString());
+        query.bindValue(":is_adding", is_adding ? true : false);
 
-        // qDebug() << sql;
-
-        if(query.exec(sql))
+        if(query.exec())
         {
             db.commit();
-
             emit logDataChanged("INFO","Stock history data added, barcode=" + barcode);
         }
 
         else
         {
             db.rollback();
-
             emit logDataChanged("CRITICAL","Error adding stock history record: " + query.lastError().text());
         }
     }
@@ -687,10 +687,13 @@ void StockItemsModel::addItemCategory(const QString &category)
 
     if(m_db.isOpen())
     {
-        QString sql = "INSERT INTO product_type(type_id,type_name) VALUES ('" + id + "', '" + category + "');";
+        QString sql = "INSERT INTO product_type(type_id,type_name) VALUES (:type_id, :type_name)";
         QSqlQuery query;
+        query.prepare(sql);
+        query.bindValue(":type_id", id);
+        query.bindValue(":type_name", category);
 
-        if(query.exec(sql))
+        if(query.exec())
         {
             m_db.commit();
 
@@ -729,9 +732,12 @@ QVariantMap StockItemsModel::loadHistory(const QString &barcode)
     if(m_db.isOpen())
     {
         QSqlQuery query;
-        QString sql = "SELECT stock_qty_before,stock_qty_added,date_updated,is_adding FROM \"stock_history\" WHERE barcode=\'"+barcode+"\' ORDER BY id DESC";
+        QString sql = "SELECT stock_qty_before,stock_qty_added,date_updated,is_adding FROM \"stock_history\" WHERE barcode=:barcode ORDER BY id DESC";
 
-        if(query.exec(sql))
+        query.prepare(sql);
+        query.bindValue(":barcode", barcode);
+
+        if(query.exec())
         {
 
             while(query.next())

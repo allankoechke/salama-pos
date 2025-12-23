@@ -170,11 +170,15 @@ void QmlInterface::getSalesStatisticsForDashboard()
     {
         QSqlQuery query;
         auto dateToday = m_dateTime->getTimestamp("today");
-        QString sql = "SELECT product_sp,sale_qty from sales WHERE sales_date > '" +dateToday.at(0)+ "' AND sales_date < '" + dateToday.at(1) + "'";
+        QString sql = "SELECT product_sp,sale_qty from sales WHERE sales_date BETWEEN :startDate AND :endDate";
 
         int counter = 0, totals = 0;
 
-        if(query.exec(sql))
+        query.prepare(sql);
+        query.bindValue(":startDate", dateToday.at(0));
+        query.bindValue(":endDate", dateToday.at(1));
+
+        if(query.exec())
         {
             while(query.next())
             {
@@ -206,18 +210,37 @@ void QmlInterface::getMessagesStatisticsForDashboard(const QString &uname)
     // Get messages (sent, received, pending) for the current logged user
     QSqlDatabase db = QSqlDatabase::database();
 
+    // TODO clean this up, remove unnecessary queries and use prepared statements
     if(db.isOpen())
     {
         QSqlQuery query;
         auto dateToday = m_dateTime->getTimestamp("today");
-        QString sql = "SELECT has_read from messages WHERE receiver = '" + uname + "';";
-        QString sql2 = "SELECT * from messages WHERE sender = '" + uname + "';";
+        QString sql = "SELECT has_read from messages WHERE receiver = :receiver";
+        QString sql2 = "SELECT * from messages WHERE sender = :sender";
 
         int sent = 0, received = 0, pending = 0;
 
-        if(query.exec(sql))
+        query.prepare(sql);
+        query.bindValue(":receiver", uname);
+
+        if(query.exec())
         {
-            while(query.next())
+            QSqlQuery query2;
+            query2.prepare(sql2);
+            query2.bindValue(":sender", uname);
+
+            if(query2.exec())
+            {
+                while(query2.next())
+                {
+                    int hasRead = query2.value(0).toBool();
+
+                    if(!hasRead)
+                        pending += 1;
+
+                    received += 1;
+                }
+            }
             {
                 int hasRead = query.value(0).toBool();
 
@@ -230,7 +253,10 @@ void QmlInterface::getMessagesStatisticsForDashboard(const QString &uname)
             setReceivedMessages(received);
             setUnreadMessages(pending);
 
-            if(query.exec(sql2))
+            query.prepare(sql2);
+            query.bindValue(":sender", uname);
+
+            if(query.exec())
             {
                 while(query.next())
                 {
@@ -261,12 +287,15 @@ void QmlInterface::getRemindersStatisticsForDashboard()
     {
         QSqlQuery query;
         auto dateToday = m_dateTime->getTimestamp("now");
-        QString sql = "SELECT solved from notifications WHERE notify_date < '" + dateToday.at(0) + "';";
-        QString sql2 = "SELECT * from notifications WHERE notify_date > '" + dateToday.at(0) + "';";
+        QString sql = "SELECT solved from notifications WHERE notify_date < :notifyDate";
+        QString sql2 = "SELECT * from notifications WHERE notify_date > :notifyDate";
 
         int due = 0, overdue = 0, solved = 0;
 
-        if(query.exec(sql))
+        query.prepare(sql);
+        query.bindValue(":notifyDate", dateToday.at(0));
+
+        if(query.exec())
         {
             while(query.next())
             {
@@ -282,10 +311,13 @@ void QmlInterface::getRemindersStatisticsForDashboard()
             setOverdueReminders(overdue);
             setSolvedReminders(solved);
 
+            QSqlQuery query2;
+            query2.prepare(sql2);
+            query2.bindValue(":notifyDate", dateToday.at(0));
 
-            if(query.exec(sql2))
+            if(query2.exec())
             {
-                while(query.next())
+                while(query2.next())
                 {
                     due += 1;
                 }
@@ -350,11 +382,19 @@ void QmlInterface::getDashboardTableData()
             QString end = n_dt.toString("yyyy-MM-dd ") + "23:59:59+03";
             QString start = n_dt.toString("yyyy-MM-dd ") + "00:00:00+03";
 
-            QString sql0, sql = "SELECT cash, mpesa, cheque, credit FROM payment INNER JOIN sales ON payment.sales_id=sales.sales_id WHERE sales_date > '"+start+"' AND sales_date < '"+end+"';";
-            sql0 = "SELECT payment_amount FROM credit_payments WHERE payment_timestamp > '"+start+"' AND payment_timestamp < '"+end+"';";
-            QSqlQuery query;
+            QString sql = "SELECT cash, mpesa, cheque, credit FROM payment INNER JOIN sales ON payment.sales_id=sales.sales_id WHERE sales_date BETWEEN :startDate AND :endDate";
+            QString sql0 = "SELECT payment_amount FROM credit_payments WHERE payment_timestamp BETWEEN :startDate AND :endDate";
+            
+            QSqlQuery query, query0;
+            query.prepare(sql);
+            query.bindValue(":startDate", start);
+            query.bindValue(":endDate", end);
 
-            if(query.exec(sql))
+            query0.prepare(sql0);
+            query0.bindValue(":startDate", start);
+            query0.bindValue(":endDate", end);
+
+            if(query.exec())
             {
                 // qDebug() << ":- Loaded ";
                 while(query.next())
@@ -367,11 +407,11 @@ void QmlInterface::getDashboardTableData()
                     // qDebug() << "Cash: " << _cash << "\tMpesa: " << _mpesa << "\tCheque: " << _cheque << "\tCredit: " << _credit;
                 }
 
-                if(query.exec(sql0))
+                if(query0.exec())
                 {
-                    while(query.next())
+                    while(query0.next())
                     {
-                        _credit_paid += query.value(0).toInt();
+                        _credit_paid += query0.value(0).toInt();
                     }
 
                 } else {
@@ -447,7 +487,28 @@ void QmlInterface::onNewVersionAvailable(const QJsonObject &json)
 
     m_UpdateJSON = json;
 
-    r_path = m_path+"/downloads/"+m_UpdateJSON.value("filename").toString();
+    // Validate the filename
+    if(m_UpdateJSON.value("filename").toString().isEmpty())
+    {
+        logToFile("CRITICAL", "QmlInterface::onNewVersionAvailable() => Filename is empty!");
+        return;
+    }
+
+    // Validate the path
+    if(m_path.isEmpty())
+    {
+        logToFile("CRITICAL", "QmlInterface::onNewVersionAvailable() => Path is empty!");
+        return;
+    }
+
+    // Validate filename is valid, does not end up leaving the base directory
+    if(m_UpdateJSON.value("filename").toString().contains(".."))
+    {
+        logToFile("CRITICAL", "QmlInterface::onNewVersionAvailable() => Filename is invalid!");
+        return;
+    }
+
+    r_path = m_path+"/downloads/" + m_UpdateJSON.value("filename").toString();
 
     if(QFileInfo::exists(r_path))
     {
@@ -512,7 +573,7 @@ void QmlInterface::onLogsTimerTimeout()
 {
     QString logName = QDateTime::currentDateTime().toString("yyyy-MM-dd")+"_app.log";
 
-    QString path = m_logsPath+"/"+logName;
+    QString path = m_logsPath + "/" + logName;
 
     setLogFileName(path.toStdString());
 
@@ -603,7 +664,8 @@ void QmlInterface::installUpdate()
     QDesktopServices::openUrl(QUrl(m_path + "/downloads/"));
     std::string str = r_path.toStdString();
     const char* cmd = str.c_str();
-    system(cmd);
+    // system(cmd);
+    // TODO implement update installation
 }
 
 void QmlInterface::getSalesSummary(const int &ind)
@@ -659,10 +721,18 @@ void QmlInterface::getSalesSummary(const int &ind)
         }
 
         QSqlQuery query, query1;
-        QString sql = "SELECT sum(cash), sum(mpesa), sum(cheque), sum(credit) FROM payment WHERE sales_id IN (SELECT DISTINCT sales_id FROM sales WHERE sales_date > '"+start+"' AND sales_date < '"+end+"');";
-        QString sql1 = "SELECT sum(payment_amount) FROM credit_payments WHERE payment_timestamp > '"+start+"' AND payment_timestamp < '"+end+"';";
+        QString sql = "SELECT sum(cash), sum(mpesa), sum(cheque), sum(credit) FROM payment WHERE sales_id IN (SELECT DISTINCT sales_id FROM sales WHERE sales_date BETWEEN :startDate AND :endDate)";
+        QString sql1 = "SELECT sum(payment_amount) FROM credit_payments WHERE payment_timestamp BETWEEN :startDate AND :endDate";
 
-        if(query.exec(sql) && query1.exec(sql1))
+        query.prepare(sql);
+        query.bindValue(":startDate", start);
+        query.bindValue(":endDate", end);
+
+        query1.prepare(sql1);
+        query1.bindValue(":startDate", start);
+        query1.bindValue(":endDate", end);
+
+        if(query.exec() && query1.exec())
         {
             int cash =0, mpesa=0,cheque=0, credit=0, paid=0, totals=0;
 

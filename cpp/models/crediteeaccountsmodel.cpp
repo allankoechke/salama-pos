@@ -147,10 +147,16 @@ void CrediteeAccountsModel::addNewCreditee(const QString &fname, const QString &
         if(db.isOpen())
         {
             QString dateToday = dateTime->getTimestamp("now").at(0);
-            QString sql = "INSERT INTO creditee(firstname,lastname,national_id,phone_no,amount_due,date_added) VALUES('" + fname + "','" + lname + "','" + idNo + "','" + mobile + "','0','" + dateToday + "');";
+            QString sql = "INSERT INTO creditee(firstname,lastname,national_id,phone_no,amount_due,date_added) VALUES(:fname, :lname, :idNo, :mobile, 0, :dateToday)";
             QSqlQuery query;
+            query.prepare(sql);
+            query.bindValue(":fname", fname);
+            query.bindValue(":lname", lname);
+            query.bindValue(":idNo", idNo);
+            query.bindValue(":mobile", mobile);
+            query.bindValue(":dateToday", dateToday);
 
-            if(query.exec(sql))
+            if(query.exec())
             {
                 db.commit();
 
@@ -199,11 +205,17 @@ void CrediteeAccountsModel::updateCreditee(const QString &fname, const QString &
     else
         if(db.isOpen())
         {
-            QString sql = "UPDATE creditee set firstname='" + fname + "',lastname='" + lname + "',national_id='" + idNo + "',phone_no='" + mobile + "' WHERE national_id='" + orig_id + "';";
+            QString sql = "UPDATE creditee set firstname=:fname,lastname=:lname,national_id=:idNo,phone_no=:mobile WHERE national_id=:orig_id";
             QSqlQuery query;
 
+            query.prepare(sql);
+            query.bindValue(":fname", fname);
+            query.bindValue(":lname", lname);
+            query.bindValue(":idNo", idNo);
+            query.bindValue(":mobile", mobile);
+            query.bindValue(":orig_id", orig_id);
 
-            if(query.exec(sql))
+            if(query.exec())
             {
                 db.commit();
 
@@ -262,10 +274,12 @@ void CrediteeAccountsModel::loadCrediteeAccounts()
     if(db.isOpen())
     {
         // QString dateToday = dateTime->getTimestamp("now").at(0);
-        QString sql = "SELECT firstname,lastname,national_id,phone_no,amount_due FROM creditee;";
+        QString sql = "SELECT firstname,lastname,national_id,phone_no,amount_due FROM creditee";
         QSqlQuery query;
 
-        if(query.exec(sql))
+        query.prepare(sql);
+
+        if(query.exec())
         {
 
             while (query.next()) {
@@ -309,10 +323,13 @@ void CrediteeAccountsModel::getPaymentHistory(const QString &idNo)
 
     if(db.isOpen())
     {
-        QString sql = "SELECT payment_timestamp,payment_amount ,payment_due FROM credit_payments WHERE creditee_id = '" + idNo + "';";
+        QString sql = "SELECT payment_timestamp,payment_amount ,payment_due FROM credit_payments WHERE creditee_id = :idNo";
         QSqlQuery query;
 
-        if(query.exec(sql))
+        query.prepare(sql);
+        query.bindValue(":idNo", idNo);
+
+        if(query.exec())
         {
 
             while (query.next()) {
@@ -362,12 +379,22 @@ bool CrediteeAccountsModel::repayDebt(const QString &crediteeId, const int &debt
 
     if(db.isOpen())
     {
-        QString sql = "UPDATE creditee SET amount_due = " +QString::number(due)+ " WHERE national_id = '"+crediteeId+"';";
-        QString sql2 = "INSERT INTO credit_payments(payment_timestamp,creditee_id,payment_amount,payment_due) VALUES ('"+dateToday+"','"+crediteeId+"','"+QString::number(paid)+"','"+QString::number(due)+"');";
+        QString sql = "UPDATE creditee SET amount_due = :due WHERE national_id = :crediteeId";
+        QString sql2 = "INSERT INTO credit_payments(payment_timestamp,creditee_id,payment_amount,payment_due) VALUES (:dateToday, :crediteeId, :paid, :due)";
 
         QSqlQuery query, query1;
 
-        if(query.exec(sql) && query1.exec(sql2))
+        query1.prepare(sql2);
+        query1.bindValue(":crediteeId", crediteeId);
+        query1.bindValue(":dateToday", dateToday);
+        query1.bindValue(":paid", paid);
+        query1.bindValue(":due", due);
+
+        query.prepare(sql);
+        query.bindValue(":crediteeId", crediteeId);
+        query.bindValue(":due", due);
+
+        if(query.exec() && query1.exec())
         {
             db.commit();
 
@@ -398,18 +425,12 @@ bool CrediteeAccountsModel::repayDebt(const QString &crediteeId, const int &debt
             if(query.lastError().text() != "")
             {
                 errStr = " [ERROR] Could't execute SQL (" + query.executedQuery() + ") : " + query.lastError().text();
-
-                // qDebug() << errStr;
-
                 emit logDataChanged("CRITICAL", errStr);
             }
 
             else
             {
                 errStr = " [ERROR] Could't execute SQL (" + query1.executedQuery() + ") : " + query1.lastError().text();
-
-                // qDebug() << errStr;
-
                 emit logDataChanged("CRITICAL", errStr);
             }
         }

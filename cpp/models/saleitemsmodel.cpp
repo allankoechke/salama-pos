@@ -264,15 +264,17 @@ void saleItemsModel::addSaleItem(const QVariant &barcode, const int &qty, const 
                 {
                     QSqlQuery writeSales;
                     //writeSales.prepare("INSERT INTO sales(sales_id,barcode,sales_date,product_bp,product_sp,sale_qty,username) VALUES(:id"+saleid.toString()+",:barcode,:date,:bp,:sp,:qty,:uname)");
-                    writeSales.prepare("INSERT INTO sales(sales_id,barcode,sales_date,product_bp,product_sp,sale_qty,username) VALUES('"+saleid.toString()+"','" +barcode.toString()+ "','"+ dateToday +"',:bp,:sp,:qty,'"+uname.toString()+"')");
-                    writeSales.bindValue(":bp", QString::number(bp));
-                    writeSales.bindValue(":sp", QString::number(sp));
-                    writeSales.bindValue(":qty", QString::number(qty));
+                    writeSales.prepare("INSERT INTO sales(sales_id,barcode,sales_date,product_bp,product_sp,sale_qty,username) VALUES(:id, :barcode, :date, :bp, :sp, :qty, :uname)");
+                    writeSales.bindValue(":id", saleid.toString());
+                    writeSales.bindValue(":barcode", barcode.toString());
+                    writeSales.bindValue(":date", dateToday);
+                    writeSales.bindValue(":bp", bp);
+                    writeSales.bindValue(":sp", sp);
+                    writeSales.bindValue(":qty", qty);
+                    writeSales.bindValue(":uname", uname.toString());
 
                     if(writeSales.exec())
                     {
-                        // qDebug() << "Success writing Sale to db";
-
                         int c_qty = currentStock - qty;
 
                         QSqlQuery stock_query;
@@ -284,16 +286,13 @@ void saleItemsModel::addSaleItem(const QVariant &barcode, const int &qty, const 
                         {
                             // TODO: check on this
                             emit updateStockChanged(barcode.toString(), c_qty);
-
                             emit updateSalesModelChanged(barcode.toString(), qty);
-
                             m_db.commit();
                         }
 
                         else
                         {
                             m_db.rollback();
-
                             emit logDataChanged("CRITICAL", "Updating Stock after sale -> " + stock_query.lastError().text());
                         }
 
@@ -303,9 +302,7 @@ void saleItemsModel::addSaleItem(const QVariant &barcode, const int &qty, const 
                     else
                     {
                         m_db.rollback();
-
                         emit saleItemAddedChanged(false);
-
                         emit logDataChanged("CRITICAL", "ERROR executing SQL: [" + writeSales.executedQuery() + "] ->" + writeSales.lastError().text());
                     }
                 }
@@ -340,7 +337,6 @@ void saleItemsModel::addMpesaSale(const QVariant &mpesaId, const QVariant &sales
     else
     {
         m_db.rollback();
-
         emit logDataChanged("CRITICAL", "Error writing sale info to mpesa: " + writeMpesa.lastError().text());
     }
 
@@ -355,9 +351,11 @@ void saleItemsModel::addCreditSale(const QVariant &crediteeId, const QVariant &d
     // qDebug() << "Creditee ID: " << crediteeId << " : " << crediteeId.toString().toInt();
     QSqlQuery writeCredit, getCreditBal, setCreditBal;
 
-    QString credBal = "SELECT amount_due FROM creditee WHERE national_id = "+crediteeId.toString()+";";
+    QString credBal = "SELECT amount_due FROM creditee WHERE national_id = :crediteeId";
+    getCreditBal.prepare(credBal);
+    getCreditBal.bindValue(":crediteeId", crediteeId.toString());
 
-    if(getCreditBal.exec(credBal))
+    if(getCreditBal.exec())
     {
         int bal = 0;
 
@@ -371,8 +369,6 @@ void saleItemsModel::addCreditSale(const QVariant &crediteeId, const QVariant &d
         setCreditBal.prepare("UPDATE creditee SET amount_due = :due WHERE national_id=:nat");
         setCreditBal.bindValue(":due", newBal);
         setCreditBal.bindValue(":nat", crediteeId.toString());
-
-        // qDebug() << "Balance : " << bal << " --> " << newBal;
 
         if(setCreditBal.exec())
         {
@@ -424,8 +420,6 @@ void saleItemsModel::addPaymentSaleDetails(const QVariant &saleId, const QJsonOb
 
     QSqlDatabase m_db = QSqlDatabase::database();
 
-    // qDebug() << ">> Adding Payment Data:: > " << QJsonDocument(json);
-
     QSqlQuery writePayment;
     writePayment.prepare("INSERT INTO payment(cash,mpesa,cheque,credit,sales_id) VALUES(:cash,:mpesa,:cheque,:credit,:id)");
     writePayment.bindValue(":cash", json.value("cash").toDouble());
@@ -433,8 +427,6 @@ void saleItemsModel::addPaymentSaleDetails(const QVariant &saleId, const QJsonOb
     writePayment.bindValue(":cheque", json.value("cheque").toString());
     writePayment.bindValue(":credit", json.value("credit").toString());
     writePayment.bindValue(":id", saleId.toString());
-
-    // qDebug() << ">> " << json.value("cash").toDouble() << ", " << json.value("mpesa").toString() << ", " << json.value("cheque").toString() << ", " << json.value("credit").toString();
 
     if(writePayment.exec())
     {
@@ -491,9 +483,13 @@ QVariantMap saleItemsModel::getItemSalesDetails(const QString &barcode, const QS
 
 
     QSqlQuery query;
-    QString sql = "SELECT sales_id,product_sp,sale_qty FROM \"sales\" WHERE barcode='"+barcode+"' AND sales_date > '"+lower+"' AND sales_date < '"+upper+"'";
+    QString sql = "SELECT sales_id,product_sp,sale_qty FROM \"sales\" WHERE barcode=:barcode AND sales_date BETWEEN :lower AND :upper";
+    query.prepare(sql);
+    query.bindValue(":barcode", barcode);
+    query.bindValue(":lower", lower);
+    query.bindValue(":upper", upper);
 
-    if(query.exec(sql))
+    if(query.exec())     
     {
         while(query.next())
         {

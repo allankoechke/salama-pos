@@ -116,13 +116,13 @@ void CompleterModel::addCompleterItems(const QVariant &str)
         QSqlDatabase m_db = QSqlDatabase::database();
 
         QSqlQuery query;
-        QString sql = "SELECT barcode, product_name, product_unit, product_company, product_sp FROM product WHERE product_name ILIKE \'" + str.toString() + "%\'";
-        // query.bindValue(":productname", str.toString());
+        QString sql = "SELECT barcode, product_name, product_unit, product_company, product_sp FROM product WHERE product_name ILIKE :productname";
 
-        if(query.exec(sql))
+        query.prepare(sql);
+        query.bindValue(":productname", str.toString() + "%");
+
+        if(query.exec())
         {
-            // qDebug() << "Executed Querry: " << query.executedQuery();
-
             while (query.next())
             {
                 QString bcode = query.value(0).toString();

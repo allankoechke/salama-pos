@@ -434,9 +434,13 @@ bool ProductSalesModel::executeQuery(const QStringList &list)
     {
         QSqlQuery itemQuery, query;
         clearModel();
-        QString _sql = "SELECT sales.sales_id,barcode,sales_date,product_bp,product_sp,sale_qty,cash,mpesa,cheque,credit FROM sales INNER JOIN payment ON sales.sales_id = payment.sales_id WHERE sales_date > '" + list.at(0) + "' AND sales_date < '" + list.at(1) +"'";
+        QString _sql = "SELECT sales.sales_id,barcode,sales_date,product_bp,product_sp,sale_qty,cash,mpesa,cheque,credit FROM sales INNER JOIN payment ON sales.sales_id = payment.sales_id WHERE sales_date BETWEEN :startDate AND :endDate";
 
-        if(query.exec(_sql))
+        query.prepare(_sql);
+        query.bindValue(":startDate", list.at(0));
+        query.bindValue(":endDate", list.at(1));
+
+        if(query.exec())
         {
             while(query.next())
             {
@@ -460,6 +464,7 @@ bool ProductSalesModel::executeQuery(const QStringList &list)
                     m_json["cheque"] = cheque;
                     m_json["credit"] = credit;
 
+                    itemQuery.clear();  // Clear the previous query
                     itemQuery.prepare("SELECT product_name,product_unit FROM product WHERE barcode=:barcode");
                     itemQuery.bindValue(":barcode", barcode);
 

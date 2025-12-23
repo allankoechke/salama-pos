@@ -1,7 +1,8 @@
 {
-    "bin": "../build/Desktop_Qt_5_15_2_GCC_64bit-Release",
+    "bin": "../build/Desktop_Qt_5_15_2_GCC_64bit-Debug/salama-pos",
     "clear": true,
     "recursiveDepth": "5",
-    "qmake": "/opt/Qt/5.15.2/gcc_64/bin/qmake",
-    "targetDir": "SalamaPOSDist"
+    "qmake": "/home/codeart/Qt/5.15.2/gcc_64/bin/qmake",
+    "targetDir": "SalamaPOSDist",
+    "qmlDir": "../qml"
 }
