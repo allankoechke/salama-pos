@@ -1,8 +1,14 @@
 #include "databaseinterface.h"
 
+#include <QDir>
+
 DatabaseInterface::DatabaseInterface(QObject *parent) : QObject(parent)
 {
+    qDebug() << "DIRS: " << QDir(":/").entryList(QDir::AllEntries | QDir::NoDotAndDotDot);
+
+
     QFile file(":/json/db-credentials.json");
+    assert(file.exists());
     auto ok = file.open(QIODevice::ReadOnly|QIODevice::Text);
     Q_ASSERT(ok); // Assert the file opened
 

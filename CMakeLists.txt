@@ -19,6 +19,7 @@ find_package(Qt6 REQUIRED COMPONENTS
 )
 
 qt_standard_project_setup()
+set(CMAKE_AUTORCC ON)
 
 qt_add_executable(salamapos
     cpp/main.cpp
@@ -49,11 +50,8 @@ qt_add_executable(salamapos
     cpp/models/src/saleitems.cpp
     cpp/models/src/stockitems.cpp
     cpp/models/src/useraccounts.cpp
-)
 
-qt_add_resources(salamapos qml
-    FILES
-        qml.qrc
+    qml.qrc
 )
 
 target_include_directories(salamapos PRIVATE cpp)

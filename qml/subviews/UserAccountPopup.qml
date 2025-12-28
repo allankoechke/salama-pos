@@ -1,10 +1,10 @@
-import QtQuick 2.0
-import QtQuick.Layouts 1.3
-import QtQuick.Controls 2.4 as Controls2
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
 
 import "../components"
 
-Controls2.Popup
+Popup
 {
     id: root
     width: 500
@@ -14,7 +14,7 @@ Controls2.Popup
     y: (mainApp.height - height)/2
 
     modal: true
-    closePolicy: Controls2.Popup.NoAutoClose
+    closePolicy: Popup.NoAutoClose
 
     property bool isNewUserAccount: true
 
@@ -93,7 +93,7 @@ Controls2.Popup
                         readOnly: !isNewUserAccount && !editable
                         label: qsTr("Firstname")
                         hintText: qsTr("Enter firstname")
-                        validator: RegExpValidator {regExp: RegExp("[a-zA-Z]+")}
+                        validator: RegularExpressionValidator { regularExpression: /[a-zA-Z]+/ }
                     }
 
                     AppTextInput
@@ -103,7 +103,7 @@ Controls2.Popup
                         readOnly: !isNewUserAccount && !editable
                         label: qsTr("Lastname")
                         hintText: qsTr("Enter lastname")
-                        validator: RegExpValidator {regExp: RegExp("[a-zA-Z]+")}
+                        validator: RegularExpressionValidator { regularExpression: /[a-zA-Z]+/ }
                     }
 
                     AppTextInput
@@ -113,7 +113,7 @@ Controls2.Popup
                         label: qsTr("Username")
                         readOnly: !isNewUserAccount && !editable
                         hintText: qsTr("Choose a username")
-                        RegExpValidator {regExp: RegExp("[a-zA-Z0-9]+")}
+                        RegularExpressionValidator { regularExpression: /[a-zA-Z0-9]+/ }
                     }
 
                     AppTextInput

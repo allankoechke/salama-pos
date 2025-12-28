@@ -1,6 +1,6 @@
-import QtQuick 2.0
-import QtQuick.Controls 2.4
-import QtQuick.Layouts 1.3
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 
 Item {
     id: root
@@ -32,7 +32,7 @@ Item {
                 selectByMouse: true
                 font.family: montserratFontLoader.name
                 color: QmlInterface.isDarkTheme? "#f4f4f4":"black"
-                validator: RegExpValidator {regExp: RegExp("([0-9]+)")}
+                validator: RegularExpressionValidator { regularExpression: /([0-9]+)/ }
 
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignVCenter

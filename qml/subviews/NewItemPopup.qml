@@ -1,10 +1,10 @@
-import QtQuick 2.0
-import QtQuick.Layouts 1.3
-import QtQuick.Controls 2.4 as Controls2
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
 
 import "../components"
 
-Controls2.Popup
+Popup
 {
     id: root
     width: 450
@@ -13,7 +13,7 @@ Controls2.Popup
     x: (mainApp.width - width)/2
     y: (mainApp.height - height)/2
     modal: true
-    closePolicy: Controls2.Popup.NoAutoClose
+    closePolicy: Popup.NoAutoClose
 
     property bool isNewItemMode
     property int currentIndex: -1
@@ -80,7 +80,7 @@ Controls2.Popup
                         prefWidth: 150
                         label: qsTr("Item Barcode")
                         hintText: qsTr("Scan/enter barcode")
-                        validator: RegExpValidator {regExp: RegExp("[a-zA-Z0-9]+")}
+                        validator: RegularExpressionValidator { regularExpression: /[a-zA-Z0-9]+/}
                         readOnly: true
                     }
 
@@ -90,8 +90,8 @@ Controls2.Popup
                         prefWidth: 150
                         label: qsTr("Item Name")
                         hintText: qsTr("Enter item name")
-                        // validator: RegExpValidator {regExp: RegExp("^[a-zA-Z0-9]+( [a-zA-Z0-9]+)*$")} // "[a-zA-Z0-9]+[\s]+")}
-                        validator: RegExpValidator {regExp: RegExp("^[a-zA-Z0-9%-]+( [a-zA-Z0-9%-]+)*$")} // "[a-zA-Z0-9]+[\s]+")}
+                        // validator: RegularExpressionValidator { regularExpression: /^[a-zA-Z0-9]+( [a-zA-Z0-9]+)*$")} // "[a-zA-Z0-9]+[\s]+")}
+                        validator: RegularExpressionValidator { regularExpression: /^[a-zA-Z0-9%-]+( [a-zA-Z0-9%-]+)*$/}
                     }
 
                     AppTextInput
@@ -100,7 +100,7 @@ Controls2.Popup
                         prefWidth: 150
                         label: qsTr("Unit")
                         hintText: qsTr("Item unit, ie, 1kg, 1g")
-                        validator: RegExpValidator {regExp: RegExp("^[a-zA-Z0-9]+( [a-zA-Z0-9]+)*$")}
+                        validator: RegularExpressionValidator { regularExpression: /^[a-zA-Z0-9]+( [a-zA-Z0-9]+)*$/}
                     }
 
                     AppTextInput
@@ -145,8 +145,7 @@ Controls2.Popup
                         prefWidth: 150
                         label: qsTr("Item's Company")
                         hintText: qsTr("Manufacturing company")
-                        // validator: RegExpValidator {regExp: RegExp("^[a-zA-Z0-9]+( [a-zA-Z0-9]+)*$")}
-                        validator: RegExpValidator {regExp: RegExp("^[a-zA-Z0-9%-]+( [a-zA-Z0-9%-]+)*$")} // "[a-zA-Z0-9]+[\s]+")}
+                        validator: RegularExpressionValidator { regularExpression: /^[a-zA-Z0-9%-]+( [a-zA-Z0-9%-]+)*$/ }
                     }
 
                     Item

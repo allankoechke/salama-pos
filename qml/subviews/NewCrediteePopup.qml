@@ -1,10 +1,10 @@
-import QtQuick 2.0
-import QtQuick.Layouts 1.3
-import QtQuick.Controls 2.4 as Controls2
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
 
 import "../components"
 
-Controls2.Popup
+Popup
 {
     id: root
     width: 450
@@ -13,7 +13,7 @@ Controls2.Popup
     x: (mainApp.width - width)/2
     y: (mainApp.height - height)/2
     modal: true
-    closePolicy: Controls2.Popup.NoAutoClose
+    closePolicy: Popup.NoAutoClose
 
     property bool isNewCrediteeMode: true
     property int currentIndex: -1
@@ -79,7 +79,7 @@ Controls2.Popup
                         prefWidth: 150
                         label: qsTr("Firstname")
                         hintText: qsTr("Creditee firstname")
-                        validator: RegExpValidator {regExp: RegExp("[a-zA-Z]+")}
+                        validator: RegularExpressionValidator { regularExpression: /"[a-zA-Z]+/}
                     }
 
                     AppTextInput
@@ -88,7 +88,7 @@ Controls2.Popup
                         prefWidth: 150
                         label: qsTr("Last Name")
                         hintText: qsTr("Creditee lastname")
-                        validator: RegExpValidator {regExp: RegExp("[a-zA-Z]+")}
+                        validator: RegularExpressionValidator { regularExpression: /"[a-zA-Z]+/}
                     }
 
                     AppTextInput
@@ -97,7 +97,7 @@ Controls2.Popup
                         prefWidth: 150
                         label: qsTr("Mobile No.")
                         hintText: qsTr("Creditee Mobile No.")
-                        validator: RegExpValidator {regExp: RegExp("[0-9]+")}
+                        validator: RegularExpressionValidator { regularExpression: /"[0-9]+/}
                     }
 
                     AppTextInput
@@ -107,7 +107,7 @@ Controls2.Popup
                         prefWidth: 150
                         label: qsTr("National ID")
                         hintText: qsTr("Creditee ID No.")
-                        validator: RegExpValidator {regExp: RegExp("[0-9]+")}
+                        validator: RegularExpressionValidator { regularExpression: /"[0-9]+/}
                     }
 
 

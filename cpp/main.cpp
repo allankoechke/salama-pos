@@ -2,6 +2,7 @@
 #include <QQmlContext>
 #include <QQuickStyle>
 #include <QQmlApplicationEngine>
+#include <QtQml/qqml.h>
 #include <QFont>
 #include <QFontDatabase>
 #include <QMessageBox>
@@ -32,15 +33,22 @@
 
 int main(int argc, char *argv[])
 {
-    QQuickStyle::setStyle(QStringLiteral("Material"));
     QApplication app(argc, argv);
+    QQuickStyle::setStyle(QStringLiteral("Material"));
 
-    int status = QFontDatabase::addApplicationFont(":/assets/fonts/montserrat/Montserrat-Regular.ttf");
-    if(status != -1)
+    int fontId = QFontDatabase::addApplicationFont(":/assets/fonts/montserrat/Montserrat-Regular.ttf");
+    if(fontId != -1)
     {
-        app.setFont(QFont(QFontDatabase::applicationFontFamilies(status).at(0)));
+        QStringList fontFamilies = QFontDatabase::applicationFontFamilies(fontId);
+        if(!fontFamilies.isEmpty())
+        {
+            app.setFont(QFont(fontFamilies.first()));
+        }
+        else
+        {
+            qDebug() << "Could not retrieve font family from loaded font!";
+        }
     }
-
     else
     {
         qDebug() << "Could not load the specified font!";
@@ -89,7 +97,9 @@ int main(int argc, char *argv[])
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
         if (!obj && url == objUrl)
+        {
             QCoreApplication::exit(-1);
+        }
     }, Qt::QueuedConnection);
 
     engine.load(url);

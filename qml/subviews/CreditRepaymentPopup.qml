@@ -1,10 +1,10 @@
-import QtQuick 2.0
-import QtQuick.Layouts 1.3
-import QtQuick.Controls 2.4 as Controls2
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
 
 import "../components"
 
-Controls2.Popup
+Popup
 {
     id: root
     width: 450
@@ -13,7 +13,7 @@ Controls2.Popup
     x: (mainApp.width - width)/2
     y: (mainApp.height - height)/2
     modal: true
-    closePolicy: Controls2.Popup.NoAutoClose
+    closePolicy: Popup.NoAutoClose
 
     property int currentIndex: -1
     property alias debt: amountDueLabel.text
@@ -105,7 +105,7 @@ Controls2.Popup
                 // inputSize: 20
                 label: qsTr("Amount to Repay")
                 hintText: qsTr("Amount in Ksh.")
-                validator: RegExpValidator {regExp: RegExp("[0-9]+")}
+                validator: RegularExpressionValidator { regularExpression: /[0-9]+/ }
             }
 
             AppText

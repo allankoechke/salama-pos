@@ -1,10 +1,9 @@
 import QtQuick 2.0
-import QtQuick.Controls 1.4 as QQC1
-import QtQuick.Controls 2.4 as QQC2
+import QtQuick.Controls
 import QtQuick.Layouts 1.3
 import "../components"
 
-QQC2.Popup
+Popup
 {
     id: root
     width: 400
@@ -31,13 +30,47 @@ QQC2.Popup
             anchors.fill: parent
             anchors.margins: 10
 
-            QQC1.Calendar
+            Item
             {
                 id: calendar
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                maximumDate: new Date()
+                property var maximumDate: new Date()
+                property var minimumDate: new Date(2000)
+
+                // TODO ...
+                // maximumDate: new Date()
+
+                GridLayout {
+                    anchors.fill: parent
+                    columns: 2
+
+                    DayOfWeekRow {
+                        locale: grid.locale
+
+                        Layout.column: 1
+                        Layout.fillWidth: true
+                    }
+
+                    WeekNumberColumn {
+                        month: grid.month
+                        year: grid.year
+                        locale: grid.locale
+
+                        Layout.fillHeight: true
+                    }
+
+                    MonthGrid {
+                        id: grid
+                        month: Calendar.December
+                        year: 2015
+                        locale: Qt.locale("en_US")
+
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                    }
+                }
             }
 
             Item {
@@ -84,7 +117,6 @@ QQC2.Popup
                         root.close()
                     }
                 }
-
             }
         }
     }
