@@ -32,12 +32,10 @@
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QQuickStyle::setStyle(QStringLiteral("Material"));
     QApplication app(argc, argv);
-    QFontDatabase fontDb;
-    int status = fontDb.addApplicationFont(":/assets/fonts/montserrat/Montserrat-Regular.ttf");
 
+    int status = QFontDatabase::addApplicationFont(":/assets/fonts/montserrat/Montserrat-Regular.ttf");
     if(status != -1)
     {
         app.setFont(QFont(QFontDatabase::applicationFontFamilies(status).at(0)));
@@ -63,6 +61,7 @@ int main(int argc, char *argv[])
 
 
     UserAccountsModel m_userAccounts;
+
     // Singletons
     QmlInterface qmlInterface;
     StockItemsModel m_stockModel;

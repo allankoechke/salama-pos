@@ -32,7 +32,7 @@ void PingServerProcess::onStartPing()
         isWaitingConnection=true;
     }
 
-    if(m_pingProcess.pid()==0)
+    if(m_pingProcess.processId()==0)
     {
         QStringList arguments;
         arguments << "-n" << m_pingUrl << "-i" << "5" << "-w" << "1000";

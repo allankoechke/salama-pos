@@ -34,9 +34,9 @@ void WebApiInterface::onCheckForUpdates(const int &cVersion)
 
     });
 
-    QUrl url("https://bjgs657959.execute-api.us-east-2.amazonaws.com/default/checkUpdatesSalamaPOS");
-    QNetworkRequest request(url);
-    m_networkManager.get(request);
+    // QUrl url("https://bjgs657959.execute-api.us-east-2.amazonaws.com/default/checkUpdatesSalamaPOS");
+    // QNetworkRequest request(url);
+    // m_networkManager.get(request);
 }
 
 void WebApiInterface::onDownloadUpdate()
@@ -97,9 +97,9 @@ void WebApiInterface::onCheckConnectivityTimerTimeout()
             hasPendingWebRequestForConnectivity = false;
         });
 
-        QUrl url("https://www.google.com/");
-        QNetworkRequest request(url);
-        m_networkManager.get(request);
+        // QUrl url("https://www.google.com/");
+        // QNetworkRequest request(url);
+        // m_networkManager.get(request);
     }
 }
 
@@ -110,13 +110,16 @@ WebInterfaceRunnable::WebInterfaceRunnable(QObject *parent):QObject(parent)
 
 void WebInterfaceRunnable::setValues(const QString &state, const QJsonObject &data)
 {
-    m_url="https://webhooks.mongodb-realm.com/api/client/v2.0/app/salamapos-bjgmz/service/salamaPOS/incoming_webhook/WebHook-SalamaPOS";
-    m_data = data;
-    m_state = state;
+    // m_url="https://webhooks.mongodb-realm.com/api/client/v2.0/app/salamapos-bjgmz/service/salamaPOS/incoming_webhook/WebHook-SalamaPOS";
+    // m_data = data;
+    // m_state = state;
 }
 
 void WebInterfaceRunnable::run()
 {
+    return;
+
+    // TODO check on this block
     QNetworkAccessManager networkManager;
     QNetworkRequest request(m_url);
 

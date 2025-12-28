@@ -3,9 +3,6 @@
 #include <QFileInfo>
 #include <QDesktopServices>
 
-// api key
-// mSRtsFRHmOS6xOkik2jWO9lMMGSkoEmmM4mgNQB11SGWDHKhNjCVhAaWFj1MONYD
-
 QmlInterface::QmlInterface(QObject *parent) : QObject(parent)
 {
     setDatabaseLoaded(false);
@@ -659,11 +656,12 @@ void QmlInterface::check4Update()
 
 void QmlInterface::installUpdate()
 {
-    qDebug() << "Update file location: " << r_path;
+    // TODO ...
+    // qDebug() << "Update file location: " << r_path;
 
-    QDesktopServices::openUrl(QUrl(m_path + "/downloads/"));
-    std::string str = r_path.toStdString();
-    const char* cmd = str.c_str();
+    // QDesktopServices::openUrl(QUrl(m_path + "/downloads/"));
+    // std::string str = r_path.toStdString();
+    // const char* cmd = str.c_str();
     // system(cmd);
     // TODO implement update installation
 }
@@ -788,14 +786,14 @@ void QmlInterface::setTabularData()
         if(query.exec(sql))
         {
             file.setFileName(":/sql/item.sql");
-            file.open(QIODevice::ReadOnly);
+            auto _ = file.open(QIODevice::ReadOnly);
             sql = file.readAll();
             file.close();
 
             if(query.exec(sql))
             {
                 file.setFileName(":/sql/stock.sql");
-                file.open(QIODevice::ReadOnly);
+                auto _ = file.open(QIODevice::ReadOnly);
                 sql = file.readAll();
                 file.close();
 

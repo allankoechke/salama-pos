@@ -3,9 +3,13 @@
 DatabaseInterface::DatabaseInterface(QObject *parent) : QObject(parent)
 {
     QFile file(":/json/db-credentials.json");
-    file.open(QIODevice::ReadOnly|QIODevice::Text);
+    auto ok = file.open(QIODevice::ReadOnly|QIODevice::Text);
+    Q_ASSERT(ok); // Assert the file opened
+
     QString jsonString = file.readAll();
     file.close();
+
+    qDebug() << "File contents: " << jsonString;
 
     QJsonDocument doc = QJsonDocument::fromJson(jsonString.toUtf8());
     QJsonObject jsonObj = doc.object();
@@ -13,43 +17,18 @@ DatabaseInterface::DatabaseInterface(QObject *parent) : QObject(parent)
     db_uname = jsonObj.value(QString("username")).toString();
     db_pswd = jsonObj.value(QString("password")).toString();
     db_name = jsonObj.value(QString("database")).toString();
-
-    /*
-    QSqlDatabase db = QSqlDatabase::database("setDb");
-    db = db.addDatabase("QPSQL");
-    db.setHostName("localhost");
-    db.setUserName(db_uname);
-    db.setPassword(db_pswd);
-    db.setDatabaseName("postgres");
-    db.open();
-
-    if(!db.isOpen())
-    {
-        qDebug() << "Couldn't open Db: " << db.lastError().text();
-    }
-
-    Q_ASSERT(db.isOpen());
-
-    QSqlQuery query;
-    QString sql, createDb = "CREATE DATABASE salama WITH OWNER = postgres ENCODING = 'UTF8' CONNECTION LIMIT = -1;";
-
-    if(query.exec(createDb))
-    {
-        qDebug() << "Database Created!";
-    } else {
-        qDebug() << "Error Creating Db: " << query.lastError().text();
-    }
-
-    db.close();
-    db.removeDatabase("setDb");
-    qDebug() << "Database Created!";
-    */
 }
 
 
 QString DatabaseInterface::initializeDatabase()
 {
     QSqlDatabase m_db;
+
+    // TODO move db vars to env variables
+    // S_DB_HOST
+    // S_DB_USERNAME
+    // S_DB_PASSWORD
+    // S_DB_NAME
 
     try {
         m_db = QSqlDatabase::database("default");
@@ -72,30 +51,19 @@ QString DatabaseInterface::initializeDatabase()
             QString sql;
 
             QFile file(":/sql/tables.sql");
-            file.open(QIODevice::ReadOnly);
+            auto _ = file.open(QIODevice::ReadOnly);
             sql = file.readAll();
 
             auto sql_segments = sql.split("--comment");
 
             m_db.transaction();
-            // int index = 0;
-
             foreach (const QString &sql_str, sql_segments)
             {
-                // index ++;
-                if(query.exec(sql_str))
-                {
-                    // m_db.commit();
-                }
-
-                else
+                if(!query.exec(sql_str))
                 {
                     m_db.rollback();
-
                     qDebug() << "Error executing : " << query.lastError().text();
                 }
-
-                // qDebug() << "Data " << index << " / " << sql_segments.size();
             }
 
             if(m_db.isOpen())
@@ -104,14 +72,12 @@ QString DatabaseInterface::initializeDatabase()
             else
             {
                 QString str = "Error Creating Db: " + query.lastError().text();
-                // qDebug() << str;
                 return "false:" + str;
             }
         }
 
     } catch (std::exception &e) {
         QString err = ">> Error executing SQL: " + QString::fromUtf8(e.what());
-        // qDebug() << err;
         return "false:"+err;
     }
 

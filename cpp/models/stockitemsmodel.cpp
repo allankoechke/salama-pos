@@ -401,8 +401,8 @@ void StockItemsModel::updateStockHistory(const QString &barcode, const int &stoc
         query.bindValue(":barcode", barcode);
         query.bindValue(":stock_qty_before", stock_qty_before);
         query.bindValue(":stock_qty_added", stock_qty_added);
-        query.bindValue(":date_updated", date_updated.toString());
-        query.bindValue(":who_updated", who_updated.toString());
+        query.bindValue(":date_updated", date_updated);
+        query.bindValue(":who_updated", who_updated);
         query.bindValue(":is_adding", is_adding ? true : false);
 
         if(query.exec())

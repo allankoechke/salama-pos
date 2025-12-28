@@ -102,9 +102,10 @@ bool ProductSalesModel::setData(const QModelIndex &index, const QVariant &value,
 
     case ProductQtyRole:
     {
-        if( sales->productQty() != value.toString())
+        // TODO, toInt may fail
+        if( sales->productQty() != value.toInt())
         {
-            sales->setProductQty(value.toString().toInt());
+            sales->setProductQty(value.toInt());
             changed = true;
         }
 
@@ -113,9 +114,9 @@ bool ProductSalesModel::setData(const QModelIndex &index, const QVariant &value,
 
     case ProductBpRole:
     {
-        if( sales->productBp() != value.toString())
+        if( sales->productBp() != value.toInt())
         {
-            sales->setProductBp(value.toString().toInt());
+            sales->setProductBp(value.toInt());
             changed = true;
         }
 
@@ -124,9 +125,9 @@ bool ProductSalesModel::setData(const QModelIndex &index, const QVariant &value,
 
     case ProductSpRole:
     {
-        if( sales->productSp() != value.toString())
+        if( sales->productSp() != value.toInt())
         {
-            sales->setProductSp(value.toString().toInt());
+            sales->setProductSp(value.toInt());
             changed = true;
         }
 

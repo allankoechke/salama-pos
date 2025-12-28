@@ -95,7 +95,8 @@ HEADERS += \
     cpp/webapiinterface.h \
     cpp/websocketsinterface.h
 
-DISTFILES +=
+DISTFILES += \
+    CMakeLists.txt
 
 android {
     ANDROID_ABIS = armeabi-v7a
