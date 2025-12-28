@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
         QMessageBox msgBox;
         msgBox.setIcon(QMessageBox::Icon::Critical);
         msgBox.setText(
-            QString(QObject::tr("Salama POS is already running, if you need to log in as another user, log out then in with the new account.\n")));
+            QString(QObject::tr("Salama POS is already running, switch to the running instance to continue.\n")));
         msgBox.exec();
         return 127;
     }

@@ -16,17 +16,14 @@ QmlInterface::QmlInterface(QObject *parent) : QObject(parent)
     m_logsPath = logsPath+"/SalamaPOS/logs";
     logToFile("INFO", "\n\n----------------------------------------\nStarting SalamaPOS Application\n----------------------------------------\n\n");
 
-    QString versionString = "21.01.01";
-
     // Set App Company Details
-    qApp->setApplicationName("Salama P.O.S.");
-    qApp->setApplicationVersion(versionString);
-    qApp->setApplicationDisplayName("Salama P.O.S. v21.01.01");
-    qApp->setOrganizationName("lalanke");
+    qApp->setOrganizationName("codeart");
     qApp->setWindowIcon(QIcon(":/assets/images/6.png"));
-    qApp->setOrganizationDomain("lalanke.com");
+    qApp->setOrganizationDomain("codeart.co.ke");
 
-    m_settings = new QSettings(QSettings::IniFormat, QSettings::UserScope, qApp->organizationName(),qApp->applicationDisplayName());
+    m_settings = new QSettings(QSettings::IniFormat, QSettings::UserScope,
+                               qApp->organizationName(),
+                               qApp->applicationDisplayName());
 
     // Retrieve settings
     setIsDarkTheme(m_settings->value("Theme/isDarkTheme", false).toBool());
@@ -45,19 +42,18 @@ QmlInterface::QmlInterface(QObject *parent) : QObject(parent)
     connect(pingServer, &PingServerProcess::connectionStatusChanged, this, &QmlInterface::onInternetConnectionStatusChanged);
     connect(m_databaseInterface, &DatabaseInterface::connectionError, this, &QmlInterface::onDatabaseConnectionError);
 
-    QString status = m_databaseInterface->initializeDatabase();
+    bool success = m_databaseInterface->initializeDatabase();
 
-    if(status.split(":").at(0) == "true")
+    if(success)
     {
         qDebug() << "Database Creation OK";
         emitDatabaseState(true, "");
         logToFile("INFO", "DatabaseInterface::initializeDatabase() => Database Connection Successful");
         setTabularData();
     }
-
     else
     {
-        QString errorMsg = status.split(":").at(1);
+        QString errorMsg = m_databaseInterface->getLastError();
         logToFile("FATAL", "DatabaseInterface::initializeDatabase() => Could not create a database Connection ==> " + errorMsg);
         emitDatabaseState(false, errorMsg);
         // Error dialog will be shown via connectionError signal

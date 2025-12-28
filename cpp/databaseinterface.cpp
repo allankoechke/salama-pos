@@ -12,38 +12,25 @@ void DatabaseInterface::loadCredentialsFromEnvironment()
 {
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     
-    // Load from environment variables with defaults (except password)
+    // Load from environment variables with defaults
     db_host = env.value("S_DB_HOST", "localhost");
     db_uname = env.value("S_DB_USERNAME", "postgres");
     db_name = env.value("S_DB_NAME", "salama");
     
-    // Password must be provided via environment variable (no default for security)
+    // Password is optional - empty means no password authentication
+    // (useful for trust/peer authentication or development environments)
     db_pswd = env.value("S_DB_PASSWORD");
-    
-    if(db_pswd.isEmpty())
-    {
-        qWarning() << "S_DB_PASSWORD environment variable is not set. Database connection may fail.";
-        m_lastError = "Database password not configured. Please set S_DB_PASSWORD environment variable.";
-    }
     
     qDebug() << "Database configuration loaded:";
     qDebug() << "  Host:" << db_host;
     qDebug() << "  Username:" << db_uname;
     qDebug() << "  Database:" << db_name;
-    qDebug() << "  Password:" << (db_pswd.isEmpty() ? "NOT SET" : "SET");
+    qDebug() << "  Password:" << (db_pswd.isEmpty() ? "Not set (no password authentication)" : "Set");
 }
 
 
-QString DatabaseInterface::initializeDatabase()
+bool DatabaseInterface::initializeDatabase()
 {
-    // Check if password is set
-    if(db_pswd.isEmpty())
-    {
-        m_lastError = "Database password not configured. Please set S_DB_PASSWORD environment variable.";
-        emit connectionError(m_lastError);
-        return "false:" + m_lastError;
-    }
-
     QSqlDatabase m_db;
 
     try {
@@ -67,7 +54,7 @@ QString DatabaseInterface::initializeDatabase()
                                  "Error: %4")
                          .arg(db_host, db_name, db_uname, m_db.lastError().text());
             emit connectionError(m_lastError);
-            return "false:" + m_lastError;
+            return false;
         }
 
         QSqlQuery query(m_db);
@@ -78,7 +65,7 @@ QString DatabaseInterface::initializeDatabase()
         {
             m_lastError = "Failed to open tables.sql resource file.";
             emit connectionError(m_lastError);
-            return "false:" + m_lastError;
+            return false;
         }
         sql = file.readAll();
         file.close();
@@ -95,7 +82,7 @@ QString DatabaseInterface::initializeDatabase()
                 m_lastError = QString("Error executing SQL: %1").arg(query.lastError().text());
                 qDebug() << "Error executing SQL: " << query.lastError().text();
                 emit connectionError(m_lastError);
-                return "false:" + m_lastError;
+                return false;
             }
         }
 
@@ -103,30 +90,25 @@ QString DatabaseInterface::initializeDatabase()
         {
             m_lastError = QString("Failed to commit database transaction: %1").arg(m_db.lastError().text());
             emit connectionError(m_lastError);
-            return "false:" + m_lastError;
+            return false;
         }
 
-        if(m_db.isOpen())
-        {
-            m_lastError.clear();
-            return "true:OK";
-        }
-        else
+        if(!m_db.isOpen())
         {
             m_lastError = QString("Database connection lost: %1").arg(m_db.lastError().text());
             emit connectionError(m_lastError);
-            return "false:" + m_lastError;
+            return false;
         }
+
+        // Success
+        m_lastError.clear();
+        return true;
 
     } catch (std::exception &e) {
         m_lastError = QString("Exception while connecting to database: %1").arg(QString::fromUtf8(e.what()));
         emit connectionError(m_lastError);
-        return "false:" + m_lastError;
+        return false;
     }
-
-    m_lastError = "Unknown error creating database";
-    emit connectionError(m_lastError);
-    return "false:" + m_lastError;
 }
 
 QString DatabaseInterface::getLastError() const

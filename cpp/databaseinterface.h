@@ -23,7 +23,10 @@ class DatabaseInterface : public QObject
 public:
     explicit DatabaseInterface(QObject *parent = nullptr);
 
-    QString initializeDatabase();
+    // Initialize database connection and create tables
+    // Returns true on success, false on failure
+    // Use getLastError() to get error details on failure
+    bool initializeDatabase();
     
     // Get connection error details for user display
     QString getLastError() const;
