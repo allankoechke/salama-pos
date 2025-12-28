@@ -17,6 +17,7 @@
 #endif
 #endif
 
+#include "version.h"
 #include "qmlinterface.h"
 #include "models/stockitemsmodel.h"
 #include "models/checkoutitemsmodel.h"
@@ -35,6 +36,19 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     QQuickStyle::setStyle(QStringLiteral("Material"));
+    
+    // Set application metadata with version
+    app.setApplicationName("Salama P.O.S.");
+    app.setApplicationVersion(SALAMA_POS_VERSION_STRING);
+    
+    // Build window title with version and optional nickname
+    QString windowTitle = QString("Salama P.O.S. v%1").arg(SALAMA_POS_VERSION_STRING);
+    QString nickname = QString(SALAMA_POS_VERSION_NICKNAME).trimmed();
+    if(!nickname.isEmpty())
+    {
+        windowTitle += QString(" (%1)").arg(nickname);
+    }
+    app.setApplicationDisplayName(windowTitle);
 
     int fontId = QFontDatabase::addApplicationFont(":/assets/fonts/montserrat/Montserrat-Regular.ttf");
     if(fontId != -1)
@@ -66,7 +80,13 @@ int main(int argc, char *argv[])
     }
 
     QQmlApplicationEngine engine;
-
+    
+    // Expose version information to QML
+    engine.rootContext()->setContextProperty("AppVersion", SALAMA_POS_VERSION_STRING);
+    engine.rootContext()->setContextProperty("AppVersionMajor", SALAMA_POS_VERSION_MAJOR);
+    engine.rootContext()->setContextProperty("AppVersionMinor", SALAMA_POS_VERSION_MINOR);
+    engine.rootContext()->setContextProperty("AppVersionPatch", SALAMA_POS_VERSION_PATCH);
+    engine.rootContext()->setContextProperty("AppVersionNickname", SALAMA_POS_VERSION_NICKNAME);
 
     UserAccountsModel m_userAccounts;
 

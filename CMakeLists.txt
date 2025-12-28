@@ -1,6 +1,22 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(salamapos LANGUAGES CXX)
+# Set version (can be overridden via -DPROJECT_VERSION=...)
+if(NOT DEFINED PROJECT_VERSION_MAJOR)
+    set(PROJECT_VERSION_MAJOR 1)
+endif()
+if(NOT DEFINED PROJECT_VERSION_MINOR)
+    set(PROJECT_VERSION_MINOR 0)
+endif()
+if(NOT DEFINED PROJECT_VERSION_PATCH)
+    set(PROJECT_VERSION_PATCH 0)
+endif()
+if(NOT DEFINED PROJECT_VERSION_NICKNAME)
+    set(PROJECT_VERSION_NICKNAME "")
+endif()
+
+set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+
+project(salamapos VERSION ${PROJECT_VERSION} LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -20,6 +36,13 @@ find_package(Qt6 REQUIRED COMPONENTS
 
 qt_standard_project_setup()
 set(CMAKE_AUTORCC ON)
+
+# Generate version header
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cpp/version.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/version.h"
+    @ONLY
+)
 
 qt_add_executable(salamapos
     cpp/main.cpp
@@ -54,7 +77,10 @@ qt_add_executable(salamapos
     qml.qrc
 )
 
-target_include_directories(salamapos PRIVATE cpp)
+target_include_directories(salamapos PRIVATE 
+    cpp
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
 
 target_link_libraries(salamapos PRIVATE
     Qt6::Core

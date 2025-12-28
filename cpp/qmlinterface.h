@@ -271,6 +271,8 @@ private slots:
     void onLogsTimerTimeout();
 
     void onInternetConnectionStatusChanged(bool state);
+    
+    void onDatabaseConnectionError(const QString &errorMessage);
 
 private:
     void initializeLogFileName();

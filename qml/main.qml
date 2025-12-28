@@ -17,6 +17,7 @@ Window {
     x: (QmlInterface.getScreenSize()["width"]-width)/2
     y: (QmlInterface.getScreenSize()["height"]-height)/2
     flags: mainAppView.navBarIndex===7? Qt.FramelessWindowHint:Qt.Window
+    title: Qt.application.displayName
 
 
     property alias montserratFontLoader: montserratFontLoader

@@ -13,6 +13,7 @@
 #include <exception>
 #include <QFile>
 #include <QDate>
+#include <QProcessEnvironment>
 
 
 class DatabaseInterface : public QObject
@@ -23,13 +24,20 @@ public:
     explicit DatabaseInterface(QObject *parent = nullptr);
 
     QString initializeDatabase();
+    
+    // Get connection error details for user display
+    QString getLastError() const;
 
 signals:
+    void connectionError(const QString &errorMessage);
 
 public slots:
 
 private:
-    QString db_pswd, db_name, db_uname;
+    void loadCredentialsFromEnvironment();
+    
+    QString db_pswd, db_name, db_uname, db_host;
+    QString m_lastError;
 };
 
 #endif // DATABASEINTERFACE_H

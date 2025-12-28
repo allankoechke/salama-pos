@@ -2,6 +2,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QDesktopServices>
+#include <QMessageBox>
 
 QmlInterface::QmlInterface(QObject *parent) : QObject(parent)
 {
@@ -42,6 +43,7 @@ QmlInterface::QmlInterface(QObject *parent) : QObject(parent)
     connect(webInt, &WebApiInterface::newVersionAvailable, this, &QmlInterface::onNewVersionAvailable);
     connect(m_WebInterface, &WebInterfaceRunnable::finished, webInt, &WebApiInterface::onWebRunnableFinished);
     connect(pingServer, &PingServerProcess::connectionStatusChanged, this, &QmlInterface::onInternetConnectionStatusChanged);
+    connect(m_databaseInterface, &DatabaseInterface::connectionError, this, &QmlInterface::onDatabaseConnectionError);
 
     QString status = m_databaseInterface->initializeDatabase();
 
@@ -55,8 +57,10 @@ QmlInterface::QmlInterface(QObject *parent) : QObject(parent)
 
     else
     {
-        logToFile("FATAL", "DatabaseInterface::initializeDatabase() => Could not create a database Connection ==> " + status.split(":").at(1));
-        emitDatabaseState(false, status.split(":").at(1));
+        QString errorMsg = status.split(":").at(1);
+        logToFile("FATAL", "DatabaseInterface::initializeDatabase() => Could not create a database Connection ==> " + errorMsg);
+        emitDatabaseState(false, errorMsg);
+        // Error dialog will be shown via connectionError signal
     }
 
     // Set default max
@@ -581,6 +585,23 @@ void QmlInterface::onInternetConnectionStatusChanged(bool state)
 {
     setIsInternetConnected(state);
     // qDebug() << "Is Connected? " << state;
+}
+
+void QmlInterface::onDatabaseConnectionError(const QString &errorMessage)
+{
+    logToFile("ERROR", "Database connection error dialog shown: " + errorMessage);
+    
+    QMessageBox msgBox;
+    msgBox.setIcon(QMessageBox::Icon::Critical);
+    msgBox.setWindowTitle("Database Connection Error");
+    msgBox.setText("Failed to connect to the database.");
+    msgBox.setInformativeText(errorMessage + "\n\nPlease check your database configuration and ensure:\n"
+                                            "- PostgreSQL server is running\n"
+                                            "- Database credentials are correct\n"
+                                            "- Environment variables are set (S_DB_HOST, S_DB_USERNAME, S_DB_PASSWORD, S_DB_NAME)");
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+    msgBox.exec();
 }
 
 void QmlInterface::initializeLogFileName()
