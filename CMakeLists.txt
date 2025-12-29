@@ -115,3 +115,5 @@ target_compile_definitions(salamapos PRIVATE QT_DEPRECATED_WARNINGS)
 #     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 #     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 # )
+
+add_subdirectory(backend)
