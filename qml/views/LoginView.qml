@@ -1,5 +1,7 @@
-import QtQuick 2.3
-import QtQuick.Layouts 1.3
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
 import "../components"
 
 Item {
@@ -17,189 +19,147 @@ Item {
         errorString = "";
     }
 
-    Item {
-        id: _root
-        width: 400
-        height: 450
-
+    // Material Design Card Container
+    Pane {
+        id: loginCard
+        width: 420
+        height: 520
         anchors.centerIn: parent
+        
+        Material.elevation: 8
+        Material.background: Material.theme === Material.Dark ? "#1E1E1E" : "#FFFFFF"
+        padding: 0
 
-        ColumnLayout
-        {
+        ColumnLayout {
             anchors.fill: parent
-            anchors.margins: 20
+            anchors.margins: 32
+            spacing: 24
 
-            Item {
+            // Logo and Title Section
+            Column {
+                Layout.topMargin: 16
+                Layout.alignment: Qt.AlignHCenter
+
+                spacing: 8
+
+                // Logo
+                Image {
+                    id: logoImage
+                    source: "qrc:/assets/images/6.png"
+                    width: 80
+                    height: 80
+                    fillMode: Image.PreserveAspectFit
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                // App Name
+                AppText {
+                    text: qsTr("Salama P.O.S.")
+                    size: 28
+                    font.bold: true
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                // Tagline
+                AppText {
+                    text: qsTr("Point of sale technology")
+                    size: 14
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+            }
+
+            // Input Fields Section
+            ColumnLayout {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 60
+                Layout.fillHeight: true
+                spacing: 16
 
-                ColumnLayout
-                {
-                    anchors.centerIn: parent
-                    spacing: 5
-
-                    Item
-                    {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 30
-
-                        RowLayout
-                        {
-                            anchors.centerIn: parent
-                            spacing: 10
-
-                            Image
-                            {
-                                visible: false
-                                source: "qrc:/assets/images/6.png"
-                                height: 30
-                                fillMode: Image.PreserveAspectCrop
-
-                                Layout.alignment: Qt.AlignVCenter|Qt.AlignLeft
-                            }
-
-                            AppText
-                            {
-                                color: "#ff8900"
-                                text: qsTr("Salama P.O.S.")
-                                font.pixelSize: 35
-
-                                Layout.fillWidth: true
-                                horizontalAlignment: AppText.AlignLeft
-                            }
-                        }
-                    }
-
-                    AppText
-                    {
-                        color: "#00a4c7"
-                        text: qsTr("Point of sale technology")
-                        font.pixelSize: 20
-                        font.italic: true
-
-                        Layout.fillWidth: true
-                        horizontalAlignment: AppText.AlignHCenter
-                    }
+                LoginInputField {
+                    id: _uname
+                    icon: "\uf007"
+                    hintText: qsTr("Username")
+                    isCorrect: false
                 }
-            }
 
-            Rectangle
-            {
-                color: QmlInterface.isDarkTheme? "#29292d":"white"
-                radius: 5
+                LoginInputField {
+                    id: _pswd
+                    icon: "\uf084"
+                    hintText: qsTr("Password")
+                    isCorrect: false
+                    isPassword: true
+                }
 
-                border.width: 1
-                border.color: "silver"
+                // Error Message
+                AppText {
+                    text: errorString
+                    size: 12
+                    color: Material.theme === Material.Dark ? "#CF6679" : "#B00020"
+                    useMaterialColors: false
+                    visible: errorString !== ""
+                    Layout.fillWidth: true
+                    Layout.topMargin: 4
+                }
 
-                Layout.preferredWidth: _root.width*0.9
-                Layout.preferredHeight: 200
-                Layout.alignment: Qt.AlignHCenter
-
-                ColumnLayout
-                {
-                    anchors.fill: parent
-                    anchors.margins: 10
-                    spacing: 5
-
-                    LoginInputField
-                    {
-                        id: _uname
-                        icon: "\uf007"
-                        hintText: qsTr("Enter Username")
-                        isCorrect: false
-                    }
-
-                    LoginInputField
-                    {
-                        id: _pswd
-                        icon: "\uf084"
-                        hintText: qsTr("Enter Password")
-                        isCorrect: false
-                        isPassword: true
-                    }
-
-                    Rectangle
-                    {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 35
-                        Layout.rightMargin: 20
-                        Layout.leftMargin: 20
-
-                        color: menuColor
-                        radius: height/2
-
-                        AppText
+                // Sign In Button
+                Button {
+                    id: signInButton
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 48
+                    Layout.topMargin: 8
+                    
+                    text: qsTr("Sign In")
+                    Material.background: Material.accent
+                    Material.foreground: "white"
+                    Material.elevation: 2
+                    
+                    font.pixelSize: 14
+                    font.bold: true
+                    
+                    onClicked: {
+                        if(QmlInterface.databaseLoaded)
                         {
-                            color: "white"
-                            text: qsTr("Sign in")
-                            font.pixelSize: 17
+                            var uname = _uname.text
+                            var pswd = _pswd.text
 
-                            anchors.centerIn: parent
-                        }
-
-                        MouseArea
-                        {
-                            anchors.fill: parent
-                            onClicked: {
-                                if(QmlInterface.databaseLoaded)
-                                {
-                                    var uname = _uname.text
-                                    var pswd = _pswd.text
-
-                                    // console.log("Accounts: ", AccountsModel.rowCount())
-                                    if(uname !== "" && pswd !== "")
-                                    {
-                                        AccountsModel.loginUser(uname, pswd);
-                                    }
-
-                                    else
-                                    {
-                                        isError = true;
-                                        errorString = qsTr("Required field is short")
-                                        AlarmsModel.addAlarmItem("error", "Empty or short Fields!")
-                                    }
-                                }
-
-                                else
-                                    AlarmsModel.addAlarmItem("error", QmlInterface.databaseConnectionErrorString)
-
+                            if(uname !== "" && pswd !== "")
+                            {
+                                AccountsModel.loginUser(uname, pswd);
+                            }
+                            else
+                            {
+                                isError = true;
+                                errorString = qsTr("Please enter both username and password")
+                                AlarmsModel.addAlarmItem("error", "Empty or short Fields!")
                             }
                         }
-                    }
-
-                    AppText
-                    {
-                        text: qsTr("Don't have an account? Create One")
-                        size: 13
-                        visible: false
-                        color: QmlInterface.isDarkTheme? "grey":"#535353"
-
-                        Layout.alignment: Qt.AlignHCenter
-                        Layout.bottomMargin: 5
-
-                        MouseArea
+                        else
                         {
-                            anchors.fill: parent
-                            onClicked: {
-                                if(QmlInterface.databaseLoaded)
-                                    userAccountPopup.open()
-
-                                else
-                                    AlarmsModel.addAlarmItem("error", QmlInterface.databaseConnectionErrorString)
-                            }
+                            AlarmsModel.addAlarmItem("error", QmlInterface.databaseConnectionErrorString)
                         }
                     }
                 }
-            }
 
-            AppText
-            {
-                color: isError? "red":"transparent"
-                text: errorString
-                visible: errorString!==""
+                // Create Account Link (hidden for now)
+                AppText {
+                    text: qsTr("Don't have an account? Create One")
+                    size: 12
+                    color: Material.accent
+                    useMaterialColors: false
+                    visible: false
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.topMargin: 8
 
-                Layout.alignment: Qt.AlignHCenter
-
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            if(QmlInterface.databaseLoaded)
+                                userAccountPopup.open()
+                            else
+                                AlarmsModel.addAlarmItem("error", QmlInterface.databaseConnectionErrorString)
+                        }
+                    }
+                }
             }
         }
 
@@ -233,10 +193,20 @@ Item {
                 else
                 {
                     console.log(" [INFO] Correct Password")
-                    startApp(true);
-                    notificationBar.visible = true;
-                    navBar.visible = true
-                    navBarIndex = 0;
+                    
+                    // Access parent MainAppView through Loader
+                    var loader = root.parent
+                    if(loader && loader.parent) {
+                        var mainView = loader.parent.parent
+                        while(mainView && mainView.objectName !== "mainAppViewRoot") {
+                            mainView = mainView.parent
+                        }
+                        
+                        if(mainView) {
+                            mainView.startApp(true)
+                            mainView.navBarIndex = 0
+                        }
+                    }
 
                     // Load the days sales
                     ProductSalesModel.showTodaysSales();

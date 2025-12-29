@@ -1,70 +1,52 @@
-import QtQuick 2.0
-import QtQuick.Layouts 1.3
-import QtQuick.Controls 2.4
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
 import "../components"
 
-Item{
+Item {
     Layout.fillWidth: true
-    Layout.preferredHeight: 40
+    Layout.preferredHeight: 56  // Material Design standard height
 
-    property alias hintText: txt.placeholderText
-    property alias text: txt.text
+    property alias hintText: _textField.placeholderText
+    property alias text: _textField.text
     property alias icon: ico.icon
-    property alias textInput: txt
+    property alias textInput: _textField
     property bool isCorrect: false
     property bool isPassword: false
 
-    RowLayout
-    {
+    RowLayout {
         anchors.fill: parent
-        spacing: 20
+        spacing: 16
 
-        AppIcon
-        {
+        AppIcon {
             id: ico
-            color: menuColor
-            size: 25
-
+            color: Material.accent
+            size: 20
             Layout.alignment: Qt.AlignVCenter
+            Layout.preferredWidth: 20
         }
 
-        TextField
-        {
-            id: txt
-            color: QmlInterface.isDarkTheme? "white":"black"
-            font.pixelSize: 15
-            echoMode: isPassword? TextInput.Password:TextInput.Normal
-
+        TextField {
+            id: _textField
             Layout.fillWidth: true
-            Layout.leftMargin: 5
-            Layout.preferredHeight: 40
-            verticalAlignment: TextInput.AlignBottom
-            horizontalAlignment: AppText.AlignLeft
-
-            /*background: Rectangle
-            {
-                color: "transparent"
-                border.width: 0
-            }
-
-            Rectangle
-            {
-                color: "silver"
-                height: 1
-                width: parent.width + 10
-
-                anchors.bottom: parent.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottomMargin: -5
-            }*/
+            Layout.preferredHeight: 56
+            
+            // Material Design styling
+            Material.accent: Material.primary
+            Material.foreground: Material.theme === Material.Dark ? Material.foreground : "#212121"
+            
+            font.pixelSize: 16
+            font.family: montserratFontLoader.name
+            echoMode: isPassword ? TextInput.Password : TextInput.Normal
+            verticalAlignment: TextInput.AlignVCenter
         }
 
-        AppIcon
-        {
-            color: "green"
-            size: 16
-            icon: isCorrect? "\uf00c":""
-
+        AppIcon {
+            color: Material.accent
+            size: 20
+            icon: isCorrect ? "\uf00c" : ""
+            visible: isCorrect
             Layout.alignment: Qt.AlignVCenter
         }
     }

@@ -1,51 +1,49 @@
-import QtQuick 2.0
-import QtQuick.Controls 2.4
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
+import QtQuick.Layouts 1.15
 
 import "../delegates"
 import "../models"
 
-Popup
-{
+Item {
     id: root
-    modal: false
-    closePolicy: "NoAutoClose"
-    x: mainApp.width - width - 20
-    y: mainApp.height - height - 20
-    width: 300
-    height: AlarmsModel.size===0? 0:AlarmsModel.size * 53
-
-    property alias alarmsListView: alarmsListView
-
-    onOpened: {
-        console.log("Popup created")
+    
+    // Material Design Snackbar positioning
+    // Snackbars appear at the bottom-right of the screen
+    anchors.bottom: parent ? parent.bottom : undefined
+    anchors.right: parent ? parent.right : undefined
+    anchors.bottomMargin: 16
+    anchors.rightMargin: 16
+    
+    width: 344  // Material Design standard width
+    height: alarmsColumn.height
+    visible: mainAppView.navBarIndex !== 7 && mainAppView.navBarIndex !== 8 && AlarmsModel.size > 0
+    
+    property alias alarmsListView: alarmsColumn
+    
+    // Compatibility function for old .open() calls
+    function open() {
+        visible = true
+    }
+    
+    function close() {
+        visible = false
     }
 
-    onClosed: {
-        console.log("Popup closing")
-    }
-
-    background: Rectangle
-    {
-        id: bg
-        width: root.width
-        height: root.height
-        visible: mainAppView.navBarIndex !== 7 && mainAppView !== 8
-        color: bgColor
-
-        ListView
-        {
-            id: alarmsListView
-            anchors.fill: parent
-            width: parent.width
-            height: parent.height
-            spacing: 5
-
+    Column {
+        id: alarmsColumn
+        width: parent.width
+        spacing: 8
+        
+        Repeater {
             model: AlarmsModel
-            delegate: AlarmsWidgetDelegate
-            {
+            
+            AlarmsWidgetDelegate {
                 alarmId: alarm_id
                 category: alarm_type
                 content: alarm_text
+                width: alarmsColumn.width
             }
         }
     }

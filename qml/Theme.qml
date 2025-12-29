@@ -63,25 +63,38 @@ QtObject {
     readonly property int radiusMedium: 8
     readonly property int radiusLarge: 16
     
-    // Component colors based on theme
+    // Material Design standard colors
+    // Background colors
     function getBackgroundColor() {
-        return Material.theme === Material.Dark ? "#1e2027" : "#f4f9fa"
+        return Material.theme === Material.Dark ? "#121212" : "#FAFAFA"
     }
     
+    // Surface colors (for cards, dialogs, etc.)
     function getSurfaceColor() {
-        return Material.theme === Material.Dark ? "#29292d" : "#FFFFFF"
+        return Material.theme === Material.Dark ? "#1E1E1E" : "#FFFFFF"
     }
     
+    // Text colors
     function getTextColor() {
-        return Material.theme === Material.Dark ? "#f4f4f4" : "#212121"
+        return Material.theme === Material.Dark ? Material.foreground : "#212121"
     }
     
     function getTextSecondaryColor() {
-        return Material.theme === Material.Dark ? "#999fa6" : "#757575"
+        return Material.theme === Material.Dark ? "#B0B0B0" : "#757575"
     }
     
+    function getTextHintColor() {
+        return Material.theme === Material.Dark ? "#666666" : "#9E9E9E"
+    }
+    
+    // Divider colors
     function getDividerColor() {
-        return Material.theme === Material.Dark ? "#3a3a3a" : "#E0E0E0"
+        return Material.theme === Material.Dark ? "#3A3A3A" : "#E0E0E0"
+    }
+    
+    // Foreground color (for Material components)
+    function getForegroundColor() {
+        return Material.theme === Material.Dark ? Material.foreground : "#212121"
     }
     
     // Update Material Design settings

@@ -1,108 +1,95 @@
-import QtQuick 2.0
-import QtQuick.Controls 2.4
-import QtQuick.Layouts 1.3
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
+import QtQuick.Layouts 1.15
 
 import "../components"
 
 Rectangle {
     id: root
 
-    width: 300
-    height: 50
-    color: category==="error"? "red":category==="info"? "green":"orange"
-    radius: 5
+    width: 344  // Material Design Snackbar standard width
+    height: Math.max(48, messageText.implicitHeight + 16)  // Minimum 48, expand for long text
+    radius: 4
+    
+    // Material Design colors based on category
+    property color snackbarColor: {
+        if (category === "error") {
+            return Material.theme === Material.Dark ? "#CF6679" : "#B00020"
+        } else if (category === "warning") {
+            return Material.theme === Material.Dark ? "#FFB74D" : "#F57C00"
+        } else { // info
+            return Material.theme === Material.Dark ? "#81C784" : "#388E3C"
+        }
+    }
+    
+    color: snackbarColor
 
     property string alarmId
-    property alias content: txt.text
+    property alias content: messageText.text
     property string category
 
-    Timer
-    {
+    Timer {
         id: alarmTimer
         repeat: false
-        interval: category==="error"? 5000:category==="info"? 3500:3500
+        interval: category === "error" ? 5000 : category === "info" ? 3500 : 3500
         running: true
 
         onTriggered: AlarmsModel.removeAlarmItem(alarmId)
     }
 
-    RowLayout
-    {
+    RowLayout {
         anchors.fill: parent
-        spacing: 0
+        anchors.leftMargin: 16
+        anchors.rightMargin: 8
+        spacing: 12
 
-        AppIcon
-        {
-            Layout.fillHeight: true
-            Layout.preferredWidth: 40
-            verticalAlignment: AppIcon.AlignVCenter
-            horizontalAlignment: AppIcon.AlignHCenter
-
-            color: category==="warning"? "#2e2e2e":"white"
-            icon: category==="error"? "\uf071":category==="info"? "\uf05a":"\uf06a"
-            size: 30
-        }
-
-        Rectangle
-        {
-            height: root.height-20
-            Layout.preferredWidth: 1
-
-            color: "silver"
+        // Icon
+        AppIcon {
+            Layout.preferredWidth: 24
+            Layout.preferredHeight: 24
             Layout.alignment: Qt.AlignVCenter
+
+            color: "white"
+            icon: category === "error" ? "\uf071" : category === "info" ? "\uf05a" : "\uf06a"
+            size: 20
         }
 
-        Item{
+        // Message text
+        AppText {
+            id: messageText
             Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            AppText
-            {
-                id: txt
-                width: parent.width-20
-                color: category==="warning"? "#2e2e2e":"white"
-                wrapMode: AppText.WordWrap
-                elide: AppText.ElideRight
-
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-        }
-
-        Rectangle
-        {
-            height: root.height-10
-            Layout.preferredWidth: 1
-
-            color: "silver"
             Layout.alignment: Qt.AlignVCenter
+            
+            text: root.content
+            color: "white"
+            useMaterialColors: false
+            wrapMode: Text.WordWrap
+            elide: Text.ElideRight
+            size: 14
         }
 
-        Item{
-            Layout.fillHeight: true
-            Layout.preferredWidth: 30
-
-            AppIcon
-            {
-                color: category==="warning"? "#2e2e2e":"white"
-                size: 15
-                icon: "\uf00d"
-
+        // Close button
+        Button {
+            Layout.preferredWidth: 24
+            Layout.preferredHeight: 24
+            Layout.alignment: Qt.AlignVCenter
+            
+            flat: true
+            Material.foreground: "white"
+            
+            AppIcon {
                 anchors.centerIn: parent
+                color: "white"
+                size: 16
+                icon: "\uf00d"
             }
-
-            MouseArea
-            {
-                anchors.fill: parent
-                onClicked: {
-                    if (alarmTimer.running === true)
-                        alarmTimer.running = false
-
-                    AlarmsModel.removeAlarmItem(alarmId)
-                }
-
+            
+            onClicked: {
+                if (alarmTimer.running === true)
+                    alarmTimer.running = false
+                AlarmsModel.removeAlarmItem(alarmId)
             }
-
         }
     }
 }
