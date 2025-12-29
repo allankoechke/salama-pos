@@ -1,11 +1,12 @@
-import QtQuick 2.0
-import QtQuick.Layouts 1.3
-import QtQuick.Controls 2.4 as Controls2
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
 
 Item
 {
     Layout.fillWidth: true
-    Layout.preferredHeight: 50
+    Layout.preferredHeight: 56  // Material Design standard height
 
     property alias currentIndex: combo.currentIndex
     property alias label: textLabel.text
@@ -14,7 +15,7 @@ Item
     RowLayout
     {
         anchors.fill: parent
-        spacing: 10
+        spacing: 16  // Material Design spacing
 
         Item
         {
@@ -24,38 +25,43 @@ Item
             AppText
             {
                 id: textLabel
-                color: QmlInterface.isDarkTheme? "#f4f4f4":"#555555"
+                color: Material.theme === Material.Dark ? Material.foreground : "#212121"
                 size: 15
+                useMaterialColors: false
 
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
             }
         }
 
-        Controls2.ComboBox
+        ComboBox
         {
             id: combo
-            Layout.minimumHeight: 45
+            Layout.minimumHeight: 56
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            font.pixelSize: 15
+            // Material Design styling
+            Material.accent: Material.primary
+            Material.foreground: Material.theme === Material.Dark ? Material.foreground : "#212121"
+            font.pixelSize: 16
             font.family: montserratFontLoader.name
         }
 
-        Rectangle
+        Button
         {
             Layout.fillHeight: true
             Layout.preferredWidth: height
-            radius: height/2
-            color: menuColor
+            Layout.maximumWidth: height
+            Material.background: Material.accent
+            Material.foreground: "white"
+            Material.elevation: 2
 
             AppIcon
             {
                 color: "white"
                 size: 15
                 icon: "\uf067"
-
                 anchors.centerIn: parent
             }
         }

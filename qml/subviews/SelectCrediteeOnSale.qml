@@ -66,14 +66,14 @@ Controls2.Popup
 
                 AppButton
                 {
-                    radius: 3
+                    // radius: 3
                     height: 36
                     width: 100
-                    bgRect.color: "transparent"
-                    bgRect.border {
-                        color: backgroundColor
-                        width: 1
-                    }
+                    // bgRect.color: "transparent"
+                    // bgRect.border {
+                    //     color: backgroundColor
+                    //     width: 1
+                    // }
 
                     text: qsTr("+ New")
                     onClicked: newCrediteePopup.open()
@@ -199,12 +199,12 @@ Controls2.Popup
 
                     AppButton
                     {
-                        radius: 3
-                        bgRect.color: "transparent"
-                        bgRect.border {
-                            color: backgroundColor
-                            width: 1
-                        }
+                        // radius: 3
+                        // bgRect.color: "transparent"
+                        // bgRect.border {
+                        //     color: backgroundColor
+                        //     width: 1
+                        // }
 
                         text: qsTr("Cancel")
                         onClicked: root.close()

@@ -141,15 +141,15 @@ Controls2.Popup
 
                             AppButton
                             {
-                                radius: 3
+                                // radius: 3
                                 Layout.fillHeight: true
                                 Layout.preferredWidth: 100
                                 text: qsTr("Cancel")
-                                bgRect.color: "transparent"
-                                bgRect.border {
-                                    width: 1
-                                    color: backgroundColor
-                                }
+                                // bgRect.color: "transparent"
+                                // bgRect.border {
+                                //     width: 1
+                                //     color: backgroundColor
+                                // }
                                 enabled: !internal.isAwaitingUpdatePasswordRequest
 
                                 onClicked: root.close()
@@ -157,7 +157,7 @@ Controls2.Popup
 
                             AppButton
                             {
-                                radius: 3
+                                // radius: 3
                                 Layout.fillHeight: true
                                 Layout.preferredWidth: 100
                                 text: qsTr("Update")

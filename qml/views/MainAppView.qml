@@ -91,28 +91,27 @@ Rectangle {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
 
-                    StackLayout
-                    {
+                    // Lazy loading views to minimize memory usage
+                    Loader {
+                        id: viewLoader
                         anchors.fill: parent
-                        currentIndex: navBarIndex
-
-                        DashboardView {}
-
-                        CheckoutView {}
-
-                        StockView { id: stackStockView }
-
-                        SalesView { id: salesView }
-
-                        MessagesView {}
-
-                        SettingsView {}
-
-                        AccountsView {}
-
-                        SplashView {}
-
-                        LoginView { id: loginView }
+                        source: getViewSource(navBarIndex)
+                        active: navBarIndex >= 0 && navBarIndex <= 8
+                        
+                        function getViewSource(index) {
+                            switch(index) {
+                                case 0: return "qrc:/qml/views/DashboardView.qml"
+                                case 1: return "qrc:/qml/views/CheckoutView.qml"
+                                case 2: return "qrc:/qml/views/StockView.qml"
+                                case 3: return "qrc:/qml/views/SalesView.qml"
+                                case 4: return "qrc:/qml/views/MessagesView.qml"
+                                case 5: return "qrc:/qml/views/SettingsView.qml"
+                                case 6: return "qrc:/qml/views/AccountsView.qml"
+                                case 7: return "qrc:/qml/views/SplashView.qml"
+                                case 8: return "qrc:/qml/views/LoginView.qml"
+                                default: return ""
+                            }
+                        }
                     }
                 }
 

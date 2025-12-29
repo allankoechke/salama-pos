@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
 
 Button {
     id: root
@@ -9,14 +10,12 @@ Button {
     property string foregroundColor: "#fff"
     property alias textIcon: ico
     property bool busy: false
-    property alias radius: bg.radius
-    property alias bgRect: bg
+    property bool useMaterialDesign: true
 
-    background: Rectangle {
-        id: bg
-        color: backgroundColor
-        opacity: root.enabled ? root.down ? 0.5 : root.hovered ? 0.8 : 1 : 0.3
-    }
+    // Use Material Design button style
+    Material.background: useMaterialDesign ? Material.accent : backgroundColor
+    Material.foreground: foregroundColor
+    Material.elevation: enabled ? (pressed ? 2 : (hovered ? 4 : 2)) : 0
 
     contentItem: Item {
         BusyIndicator {
@@ -25,16 +24,18 @@ Button {
             height: 32
             width: 32
             anchors.centerIn: parent
+            Material.accent: foregroundColor
         }
 
         Row {
             spacing: 8
             anchors.centerIn: parent
+            visible: !busy
 
             AppIcon
             {
                 id: ico
-                visible: icon !==""
+                visible: icon !== ""
                 color: foregroundColor
                 size: 15
                 anchors.verticalCenter: parent.verticalCenter
@@ -42,11 +43,11 @@ Button {
 
             AppText
             {
-                visible: !busy
                 color: foregroundColor
                 size: 15
                 text: root.text
                 anchors.verticalCenter: parent.verticalCenter
+                useMaterialColors: false
             }
         }
     }

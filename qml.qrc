@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>qml/main.qml</file>
+        <file>qml/Theme.qml</file>
         <file>qml/components/AppIcon.qml</file>
         <file>qml/components/AppImage.qml</file>
         <file>qml/components/AppText.qml</file>

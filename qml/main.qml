@@ -27,18 +27,17 @@ Window {
     property bool isCrediteeSelected: false
 
     Material.theme: QmlInterface.isDarkTheme? Material.Dark: Material.Light
+    Material.accent: "#12679a"
+    Material.primary: "#12679a"
 
-    //    Material.background: "#f4f9fa"
-    //    dark-bg: #1e2027
-    //    dark-pane: #29292d
-    //    dark-menu: #161719
-    //    Background Colors
-    //    dark-fore-color: #f4f4f4
-    //    dark-ico: #999fa6
+    // Theme instance
+    Theme {
+        id: appTheme
+    }
 
-    property string bgColor: QmlInterface.isDarkTheme? "#1e2027":"#f4f9fa"
-    property string menuColor: "#12679a"
-    property string tableHeaderColor: "#5f00ff"
+    property string bgColor: appTheme.getBackgroundColor()
+    property string menuColor: appTheme.menuColor
+    property string tableHeaderColor: appTheme.tableHeaderColor
     property bool isDialogClosedAfterEachAdd: false
 
     // Logged in user

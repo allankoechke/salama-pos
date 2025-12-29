@@ -1,12 +1,13 @@
-import QtQuick 2.0
-import QtQuick.Layouts 1.3
-import QtQuick.Controls 2.4 as Controls2
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
 
 Item
 {
     Layout.fillWidth: true
     Layout.preferredHeight: implicitHeight
-    implicitHeight: 40
+    implicitHeight: 56  // Material Design standard height
 
     property alias label: textLabel.text
     property alias readOnly: textInput.readOnly
@@ -21,7 +22,7 @@ Item
     RowLayout
     {
         anchors.fill: parent
-        spacing: 10
+        spacing: 16  // Material Design spacing
 
         Item
         {
@@ -31,25 +32,28 @@ Item
             AppText
             {
                 id: textLabel
-                color: QmlInterface.isDarkTheme? "#f4f4f4":"#555555"
+                color: Material.theme === Material.Dark ? Material.foreground : "#212121"
                 size: 15
+                useMaterialColors: false
 
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
             }
         }
 
-        Controls2.TextField
+        TextField
         {
             id: textInput
             Layout.fillWidth: true
             Layout.fillHeight: true
-            verticalAlignment: Controls2.TextField.AlignBottom
-            horizontalAlignment: Controls2.TextField.AlignLeft
+            verticalAlignment: TextField.AlignVCenter
+            horizontalAlignment: TextField.AlignLeft
 
-            color: QmlInterface.isDarkTheme? "#f4f4f4":"black"
+            // Material Design styling
+            Material.accent: Material.primary
+            Material.foreground: Material.theme === Material.Dark ? Material.foreground : "#212121"
             selectByMouse: true
-            font.pixelSize: 15
+            font.pixelSize: 16
             font.family: montserratFontLoader.name
         }
     }
