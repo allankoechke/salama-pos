@@ -171,10 +171,10 @@ Controls2.Popup
                                 console.log("Value", parseInt(qtySpinbox.value), "From: ", qtySpinbox.from, ", To: ", qtySpinbox.to)
 
                                 if( parseInt(qtySpinbox.value) < from || qtySpinbox.value==='' )
-                                    AlarmsModel.addAlarmItem("error", "Quantity CANT be ZERO!")
+                                    ToastModel.addToastItem("error", "Quantity CANT be ZERO!")
 
                                 else if( parseInt(qtySpinbox.value) > to )
-                                    AlarmsModel.addAlarmItem("error", "Quantity entered exceeds quantity available!")
+                                    ToastModel.addToastItem("error", "Quantity entered exceeds quantity available!")
 
                                 else
                                     CheckoutModel.changeSellStock(parseInt(qtySpinbox.value), barcode);
@@ -195,14 +195,14 @@ Controls2.Popup
             if(state)
             {
                 console.log("Sale Qty Update successful!");
-                AlarmsModel.addAlarmItem("info", "Quantity added successfully")
+                ToastModel.addToastItem("info", "Quantity added successfully")
                 root.close();
             }
 
             else
             {
                 console.log("Sale Qty failed!");
-                AlarmsModel.addAlarmItem("error", "Quantity add failed")
+                ToastModel.addToastItem("error", "Quantity add failed")
             }
         }
     }

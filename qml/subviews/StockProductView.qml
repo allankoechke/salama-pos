@@ -82,7 +82,7 @@ Rectangle {
 
                             else
                             {
-                                AlarmsModel.addAlarmItem("error", "Sorry, this is done by admins only!")
+                                ToastModel.addToastItem("error", "Sorry, this is done by admins only!")
                             }
                         }
                     }

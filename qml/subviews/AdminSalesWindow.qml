@@ -253,7 +253,7 @@ Window {
                 color: menuColor
 
                 onClicked: {
-                    isInvalidSelected? AlarmsModel.addAlarmItem("error", "No valid item selected"):getItems();
+                    isInvalidSelected? ToastModel.addToastItem("error", "No valid item selected"):getItems();
                 }
 
                 AppText
@@ -602,7 +602,7 @@ Window {
 
         function onEmitError(s,l)
         {
-            AlarmsModel.addAlarmItem(s,l);
+            ToastModel.addToastItem(s,l);
         }
     }
 

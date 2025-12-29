@@ -191,7 +191,7 @@ Controls2.Popup
             isError = true;
             errorText = qsTr("New Password do not match, or is short")
             console.log("New Password do not match, or is short")
-            AlarmsModel.addAlarmItem("error", "New Password do not match, or is short!")
+            ToastModel.addToastItem("error", "New Password do not match, or is short!")
             return;
         }
 
@@ -215,7 +215,7 @@ Controls2.Popup
         function onUserPasswordChanged(ok) {
             internal.isAwaitingUpdatePasswordRequest = false;
             if(ok) {
-                AlarmsModel.addAlarmItem("success", "Password updated, logging you out!")
+                ToastModel.addToastItem("success", "Password updated, logging you out!")
 
                 navBarIndex = 8;
                 loginView.clearFields();
@@ -227,7 +227,7 @@ Controls2.Popup
 
         function onUserPasswordChangeError(reason) {
             internal.isAwaitingUpdatePasswordRequest = false;
-            AlarmsModel.addAlarmItem("error", reason)
+            ToastModel.addToastItem("error", reason)
         }
     }
 }

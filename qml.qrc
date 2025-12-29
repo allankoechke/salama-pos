@@ -95,7 +95,7 @@
         <file>qml/subviews/CrediteePaymentsTableHeader.qml</file>
         <file>qml/delegates/CrediteePaymentsTableDelegate.qml</file>
         <file>qml/subviews/SelectCrediteeOnSale.qml</file>
-        <file>qml/delegates/AlarmsWidgetDelegate.qml</file>
+        <file>qml/delegates/ToastDelegate.qml</file>
         <file>qml/delegates/CrediteeOnSaleDelegate.qml</file>
         <file>sql/item.sql</file>
         <file>sql/stock.sql</file>
@@ -107,7 +107,7 @@
         <file>qml/logic/Backup.qml</file>
         <file>qml/logic/Logic.qml</file>
         <file>qml/components/CustomButton.qml</file>
-        <file>qml/subviews/AlarmsPopup.qml</file>
+        <file>qml/subviews/ToastPopup.qml</file>
         <file>py/server.py</file>
         <file>qml/subviews/StockHistoryWindow.qml</file>
         <file>qml/delegates/StockHistoryDelegate.qml</file>

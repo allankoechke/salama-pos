@@ -629,7 +629,7 @@ Item {
 
                                         else
                                         {
-                                            AlarmsModel.addAlarmItem("error", "User has no rights to add users")
+                                            ToastModel.addToastItem("error", "User has no rights to add users")
 
                                             QmlInterface.logToFile("INFO", "QML => DashboardView::AddNewUser User has no rights to add users")
                                         }

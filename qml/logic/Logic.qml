@@ -11,7 +11,7 @@ Item {
         var d = StockItemModel.generatePriceList();
         var html = _generatePriceList(d);
 
-        AlarmsModel.addAlarmItem('info', 'Price List generation beginning ...')
+        ToastModel.addToastItem('info', 'Price List generation beginning ...')
 
         var req = new XMLHttpRequest();
         req.open("POST", url);
@@ -28,7 +28,7 @@ Item {
 
                 console.log("Request successful!")
 
-                AlarmsModel.addAlarmItem('info', 'Price List generated successfully')
+                ToastModel.addToastItem('info', 'Price List generated successfully')
 
                 console.log(req.responseText)
 
@@ -40,7 +40,7 @@ Item {
         req.onerror = function()
         {
             console.log("Request failed!")
-            AlarmsModel.addAlarmItem('error', 'Price List generation failed, try again later.')
+            ToastModel.addToastItem('error', 'Price List generation failed, try again later.')
         }
 
         req.send(JSON.stringify({ "html": html }));

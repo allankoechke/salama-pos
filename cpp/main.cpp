@@ -26,7 +26,7 @@
 #include "models/saleitemsmodel.h"
 #include "models/productsalesmodel.h"
 #include "models/crediteeaccountsmodel.h"
-#include "models/alarmsmodel.h"
+#include "models/toastmodel.h"
 #include "processinterface.h"
 #include "runguard.h"
 
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
     saleItemsModel m_saleItem;
     ProductSalesModel m_pSale;
     CrediteeAccountsModel creditee;
-    AlarmsModel m_alarmModel;
+    ToastModel m_toastModel;
 
     engine.rootContext()->setContextProperty("QmlInterface", &qmlInterface);
     engine.rootContext()->setContextProperty("StockItemModel", &m_stockModel);
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("SalesModel", &m_saleItem);
     engine.rootContext()->setContextProperty("ProductSalesModel", &m_pSale);
     engine.rootContext()->setContextProperty("CrediteeModel", &creditee);
-    engine.rootContext()->setContextProperty("AlarmsModel", &m_alarmModel);
+    engine.rootContext()->setContextProperty("ToastModel", &m_toastModel);
 
     qmlRegisterType<ProcessInterface>("me.devqt.Controls",1,0,"Process");
 

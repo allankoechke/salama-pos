@@ -88,7 +88,7 @@ Item {
 
                             else
                             {
-                                AlarmsModel.addAlarmItem("error", "User has no rights to add users")
+                                ToastModel.addToastItem("error", "User has no rights to add users")
                                 QmlInterface.logToFile("WARNING", "QML => AccountsView::AddNewUser User doesnt have rights to add users")
                                 console.log("[Error] User doesnt have rights to add users")
                             }
@@ -166,7 +166,7 @@ Item {
                                     {
                                         if( uname == mainApp.loggedUser_username)
                                         {
-                                            AlarmsModel.addAlarmItem("warning","Can't change priviledges for your own account!")
+                                            ToastModel.addToastItem("warning","Can't change priviledges for your own account!")
                                             QmlInterface.logToFile("WARNING", "QML => AccountsView::EditAccount Attempting to change privileges for own account")
                                         }
 
@@ -188,7 +188,7 @@ Item {
 
                                     else
                                     {
-                                        AlarmsModel.addAlarmItem("warning","This can be done by admins only!")
+                                        ToastModel.addToastItem("warning","This can be done by admins only!")
                                         QmlInterface.logToFile("WARNING", "QML => AccountsView::EditAccount This can be done by admins only")
                                     }
                                 }

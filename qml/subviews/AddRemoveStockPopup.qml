@@ -266,7 +266,7 @@ Controls2.Popup
                                     else
                                     {
                                         console.log("Adding a zero qty to stock")
-                                        AlarmsModel.addAlarmItem("error", "Quantity is ZERO!")
+                                        ToastModel.addToastItem("error", "Quantity is ZERO!")
                                     }
                                 }
 
@@ -283,13 +283,13 @@ Controls2.Popup
                                     else
                                     {
                                         if( valueQty > currentStock )
-                                            AlarmsModel.addAlarmItem("error", "Quantity entered exceeds quantity available")
+                                            ToastModel.addToastItem("error", "Quantity entered exceeds quantity available")
 
                                         else if( !hasPermissions )
-                                            AlarmsModel.addAlarmItem("error", "This can only be done by ADMINs.")
+                                            ToastModel.addToastItem("error", "This can only be done by ADMINs.")
 
                                         else if( valueQty === 0 )
-                                            AlarmsModel.addAlarmItem("error", "Quantity is ZERO!")
+                                            ToastModel.addToastItem("error", "Quantity is ZERO!")
 
                                         console.log("Removing 0 items from Stock OR Quantity to remove exceeds qty available OR You dont have permissions to do such!")
                                     }
@@ -311,14 +311,14 @@ Controls2.Popup
             if(state)
             {
                 console.log("Stock update successful!");
-                AlarmsModel.addAlarmItem("info", "Stock update successful")
+                ToastModel.addToastItem("info", "Stock update successful")
                 root.close();
             }
 
             else
             {
                 console.log("Stock update failed!");
-                AlarmsModel.addAlarmItem("error", "Stock update failed")
+                ToastModel.addToastItem("error", "Stock update failed")
             }
         }
     }

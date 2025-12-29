@@ -56,7 +56,7 @@ qt_add_executable(salamapos
     cpp/webapiinterface.cpp
     cpp/websocketsinterface.cpp
 
-    cpp/models/alarmsmodel.cpp
+    cpp/models/toastmodel.cpp
     cpp/models/checkoutitemsmodel.cpp
     cpp/models/completermodel.cpp
     cpp/models/crediteeaccountsmodel.cpp
@@ -65,7 +65,7 @@ qt_add_executable(salamapos
     cpp/models/stockitemsmodel.cpp
     cpp/models/useraccountsmodel.cpp
 
-    cpp/models/src/alarms.cpp
+    cpp/models/src/toast.cpp
     cpp/models/src/checkoutitems.cpp
     cpp/models/src/completer.cpp
     cpp/models/src/crediteeaccount.cpp

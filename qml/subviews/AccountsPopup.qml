@@ -249,14 +249,14 @@ Controls2.Popup
             if(status)
             {
                 console.log(" [INFO] User deleted successfully!");
-                AlarmsModel.addAlarmItem("info", "User deleted successfully!")
+                ToastModel.addToastItem("info", "User deleted successfully!")
                 root.close();
             }
 
             else
             {
                 console.log(" [ERROR] Error Deleting User");
-                AlarmsModel.addAlarmItem("error", "Error deleting user")
+                ToastModel.addToastItem("error", "Error deleting user")
             }
         }
 
@@ -265,14 +265,14 @@ Controls2.Popup
             if(status)
             {
                 console.log(" [INFO] User priviledges updated Successfuly!");
-                AlarmsModel.addAlarmItem("info", "User privileges updated")
+                ToastModel.addToastItem("info", "User privileges updated")
                 root.close();
             }
 
             else
             {
                 console.log(" [ERROR] Error Updating User Priviledges");
-                AlarmsModel.addAlarmItem("error", "User priviledges update failed")
+                ToastModel.addToastItem("error", "User priviledges update failed")
             }
         }
     }

@@ -64,9 +64,6 @@ Window {
     property alias backup: backup
     property alias logic: logic
 
-    // property alias alarmsListView: mainAppView.alarmsPopup.alarmsListView
-
-
     Component.onCompleted: {
         popupTimer.start();
         timer1.start();

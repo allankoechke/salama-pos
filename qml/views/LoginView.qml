@@ -129,12 +129,12 @@ Item {
                             {
                                 isError = true;
                                 errorString = qsTr("Please enter both username and password")
-                                AlarmsModel.addAlarmItem("error", "Empty or short Fields!")
+                                ToastModel.addToastItem("error", "Empty or short Fields!")
                             }
                         }
                         else
                         {
-                            AlarmsModel.addAlarmItem("error", QmlInterface.databaseConnectionErrorString)
+                            ToastModel.addToastItem("error", QmlInterface.databaseConnectionErrorString)
                         }
                     }
                 }
@@ -156,7 +156,7 @@ Item {
                             if(QmlInterface.databaseLoaded)
                                 userAccountPopup.open()
                             else
-                                AlarmsModel.addAlarmItem("error", QmlInterface.databaseConnectionErrorString)
+                                ToastModel.addToastItem("error", QmlInterface.databaseConnectionErrorString)
                         }
                     }
                 }
@@ -174,7 +174,7 @@ Item {
                     isError = true
                     errorString = qsTr("Invalid login details")
                     console.log("Username doesnt exist")
-                    AlarmsModel.addAlarmItem("error", "Invalid login credentials")
+                    ToastModel.addToastItem("error", "Invalid login credentials")
                 }
             }
 
@@ -187,7 +187,7 @@ Item {
                     isError = true
                     errorString = qsTr("Invalid login details")
                     console.log(" [ERROR] Wrong Password")
-                    AlarmsModel.addAlarmItem("error", "Invalid password")
+                    ToastModel.addToastItem("error", "Invalid password")
                 }
 
                 else
@@ -215,7 +215,7 @@ Item {
                     CrediteeModel.loadCrediteeAccounts();
                     QmlInterface.check4Update();
 
-                    AlarmsModel.addAlarmItem("info", "Login successful!")
+                    ToastModel.addToastItem("info", "Login successful!")
                 }
             }
 

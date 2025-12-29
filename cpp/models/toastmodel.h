@@ -1,26 +1,26 @@
-#ifndef ALARMSMODEL_H
-#define ALARMSMODEL_H
+#ifndef TOASTMODEL_H
+#define TOASTMODEL_H
 
 #include <QObject>
 #include <QDebug>
 #include <QDateTime>
 #include <QAbstractListModel>
 
-#include "src/alarms.h"
+#include "src/toast.h"
 
-class AlarmsModel : public QAbstractListModel
+class ToastModel : public QAbstractListModel
 {
     Q_OBJECT
 
-    enum AlarmsModelRoles{
-        AlarmTypeRole = Qt::UserRole + 1,
-        AlarmStringRole,
-        AlarmIdRole,
-        AlarmIsActiveRole
+    enum ToastModelRoles{
+        ToastTypeRole = Qt::UserRole + 1,
+        ToastStringRole,
+        ToastIdRole,
+        ToastIsActiveRole
     };
 
 public:
-    explicit AlarmsModel(QObject *parent = nullptr);
+    explicit ToastModel(QObject *parent = nullptr);
 
     // QAbstractListModel overrides
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -37,12 +37,12 @@ public:
     Q_PROPERTY(int size READ size WRITE setSize NOTIFY sizeChanged)
 
     // Q_INVOKABLES
-    Q_INVOKABLE void addAlarmItem(const QString &type, const QString &content);
-    Q_INVOKABLE void removeAlarmItem(const QVariant &id);
+    Q_INVOKABLE void addToastItem(const QString &type, const QString &content);
+    Q_INVOKABLE void removeToastItem(const QVariant &id);
 
     // Internals
-    void addAlarmItem(Alarms * alarms);
-    int getAlarmId(const QVariant &id);
+    void addToastItem(Toast * toast);
+    int getToastId(const QVariant &id);
 
     int size() const;
 
@@ -54,9 +54,10 @@ signals:
     void sizeChanged(int size);
 
 private:
-    QList<Alarms *> m_alarmsList;
+    QList<Toast *> m_toastList;
 
     int m_size;
 };
 
-#endif // ALARMSMODEL_H
+#endif // TOASTMODEL_H
+

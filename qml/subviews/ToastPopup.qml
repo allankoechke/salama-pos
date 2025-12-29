@@ -17,10 +17,10 @@ Item {
     anchors.rightMargin: 16
     
     width: 344  // Material Design standard width
-    height: alarmsColumn.height
-    visible: mainAppView.navBarIndex !== 7 && mainAppView.navBarIndex !== 8 && AlarmsModel.size > 0
+    height: toastsColumn.height
+    visible: mainAppView.navBarIndex !== 7 && mainAppView.navBarIndex !== 8 && ToastModel.size > 0
     
-    property alias alarmsListView: alarmsColumn
+    property alias toastsListView: toastsColumn
     
     // Compatibility function for old .open() calls
     function open() {
@@ -32,19 +32,20 @@ Item {
     }
 
     Column {
-        id: alarmsColumn
+        id: toastsColumn
         width: parent.width
         spacing: 8
         
         Repeater {
-            model: AlarmsModel
+            model: ToastModel
             
-            AlarmsWidgetDelegate {
-                alarmId: alarm_id
-                category: alarm_type
-                content: alarm_text
-                width: alarmsColumn.width
+            ToastDelegate {
+                toastId: toast_id
+                category: toast_type
+                content: toast_text
+                width: toastsColumn.width
             }
         }
     }
 }
+

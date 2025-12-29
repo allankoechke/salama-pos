@@ -297,14 +297,14 @@ Popup
             if(status)
             {
                 console.log(" [INFO] Item Updated Successfuly!");
-                AlarmsModel.addAlarmItem("info", "Item updated successfully!")
+                ToastModel.addToastItem("info", "Item updated successfully!")
                 root.close();
             }
 
             else
             {
                 console.log(" [ERROR] Error Updating item");
-                AlarmsModel.addAlarmItem("error", "Error updating item")
+                ToastModel.addToastItem("error", "Error updating item")
             }
         }
 
@@ -313,14 +313,14 @@ Popup
             if(status)
             {
                 console.log(" [INFO] Item Deleted Successfuly!");
-                AlarmsModel.addAlarmItem("info", "Item deleted successfully!")
+                ToastModel.addToastItem("info", "Item deleted successfully!")
                 root.close();
             }
 
             else
             {
                 console.log(" [ERROR] Error Deleting item");
-                AlarmsModel.addAlarmItem("error", "Error deleting item")
+                ToastModel.addToastItem("error", "Error deleting item")
             }
         }
 
@@ -329,14 +329,14 @@ Popup
             if(status)
             {
                 console.log(" [INFO] Item Added Successfuly!");
-                AlarmsModel.addAlarmItem("info", "Item added successfully!")
+                ToastModel.addToastItem("info", "Item added successfully!")
                 root.close();
             }
 
             else
             {
                 console.log(" [ERROR] Error Adding item");
-                AlarmsModel.addAlarmItem("error", "Error adding item")
+                ToastModel.addToastItem("error", "Error adding item")
             }
         }
 

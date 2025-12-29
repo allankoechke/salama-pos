@@ -380,7 +380,7 @@ Controls2.Drawer {
                                     else
                                     {
                                         console.log(" [ERROR] Paid amont is less than the required amount")
-                                        AlarmsModel.addAlarmItem("error", "Amount paid is less than owed")
+                                        ToastModel.addToastItem("error", "Amount paid is less than owed")
                                     }
                                 }
                             }
@@ -406,7 +406,7 @@ Controls2.Drawer {
             if(bal===0)
             {
                 root.close();
-                AlarmsModel.addAlarmItem("info", "Success repaying debt")
+                ToastModel.addToastItem("info", "Success repaying debt")
             }
 
             else
@@ -473,7 +473,7 @@ Controls2.Drawer {
             else
             {
                 console.log(" [ERROR] Error Adding Sale Items")
-                AlarmsModel.addAlarmItem("error", "Error adding sale item")
+                ToastModel.addToastItem("error", "Error adding sale item")
             }
         }
 
@@ -492,13 +492,13 @@ Controls2.Drawer {
                 }
 
 
-                AlarmsModel.addAlarmItem("info", "Success adding sale items")
+                ToastModel.addToastItem("info", "Success adding sale items")
             }
 
             else
             {
                 console.log(" [ERROR] Error Adding Payment Details")
-                AlarmsModel.addAlarmItem("error", "Error adding payment details")
+                ToastModel.addToastItem("error", "Error adding payment details")
             }
         }
 

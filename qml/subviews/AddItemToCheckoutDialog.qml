@@ -262,7 +262,7 @@ Window {
         function onItemStockWarningChanged()
         {
             console.log(">> Stock is less to complete this add!")
-            AlarmsModel.addAlarmItem("error", "Stock is less to add to Checkout")
+            ToastModel.addToastItem("error", "Stock is less to add to Checkout")
         }
 
         function onItemDataChanged(status, jsonObj)
@@ -283,7 +283,7 @@ Window {
             else
             {
                 console.log(">> Failed to Add Item to Checkout Model!")
-                AlarmsModel.addAlarmItem("error", "Failed to Add Item to Checkout Model")
+                ToastModel.addToastItem("error", "Failed to Add Item to Checkout Model")
             }
         }
 

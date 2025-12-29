@@ -25,17 +25,17 @@ Rectangle {
     
     color: snackbarColor
 
-    property string alarmId
+    property string toastId
     property alias content: messageText.text
     property string category
 
     Timer {
-        id: alarmTimer
+        id: toastTimer
         repeat: false
         interval: category === "error" ? 5000 : category === "info" ? 3500 : 3500
         running: true
 
-        onTriggered: AlarmsModel.removeAlarmItem(alarmId)
+        onTriggered: ToastModel.removeToastItem(toastId)
     }
 
     RowLayout {
@@ -61,7 +61,6 @@ Rectangle {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignVCenter
             
-            text: root.content
             color: "white"
             useMaterialColors: false
             wrapMode: Text.WordWrap
@@ -86,10 +85,11 @@ Rectangle {
             }
             
             onClicked: {
-                if (alarmTimer.running === true)
-                    alarmTimer.running = false
-                AlarmsModel.removeAlarmItem(alarmId)
+                if (toastTimer.running === true)
+                    toastTimer.running = false
+                ToastModel.removeToastItem(toastId)
             }
         }
     }
 }
+

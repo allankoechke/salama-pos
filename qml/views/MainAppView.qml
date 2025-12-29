@@ -24,7 +24,7 @@ Rectangle {
     property alias selectCrediteeOnSale: selectCrediteeOnSale
     property alias salesSummaryDialog: salesSummaryDialog
     property alias messageBox: messageBox
-    property alias alarmsPopup: alarmsPopup
+    property alias toastPopup: toastPopup
     property alias stockHistoryWindow: stockHistoryWindow
     property alias adminSalesWindow: adminSalesWindow
     property alias passwordResetPopup: passwordResetPopup
@@ -57,7 +57,7 @@ Rectangle {
     }
 
     Component.onCompleted: {
-        alarmsPopup.open()
+        toastPopup.open()
     }
 
     RowLayout
@@ -322,9 +322,9 @@ Rectangle {
         id: salesSummaryDialog
     }
 
-    AlarmsPopup
+    ToastPopup
     {
-        id: alarmsPopup
+        id: toastPopup
     }
 
     AdminSalesWindow

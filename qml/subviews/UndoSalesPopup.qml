@@ -169,7 +169,7 @@ Popup
 
                         else
                         {
-                            AlarmsModel.addAlarmItem("error", "Quantity entered is invalid!")
+                            ToastModel.addToastItem("error", "Quantity entered is invalid!")
                         }
                     }
 
