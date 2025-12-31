@@ -181,7 +181,7 @@ Controls2.Popup
             internal.isAwaitingUpdatePasswordRequest = false;
             isError = true;
             errorText = qsTr("Current password cannot be empty")
-            console.log("Current password cannot be empty")
+            logger.debug("Current password cannot be empty")
             return;
         }
 
@@ -190,7 +190,7 @@ Controls2.Popup
             internal.isAwaitingUpdatePasswordRequest = false;
             isError = true;
             errorText = qsTr("New Password do not match, or is short")
-            console.log("New Password do not match, or is short")
+            logger.debug("New Password do not match, or is short")
             ToastModel.addToastItem("error", "New Password do not match, or is short!")
             return;
         }

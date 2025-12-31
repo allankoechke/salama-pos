@@ -1,4 +1,5 @@
 #include "stockitemsmodel.h"
+#include "logger.h"
 
 StockItemsModel::StockItemsModel(QObject *parent) : QAbstractListModel(parent)
 {
@@ -584,7 +585,7 @@ int StockItemsModel::getItemStock(const QVariant &barcode)
         }
     }
 
-    qDebug() << ">> This item was not found";
+    Logger::logWarning("Item not found in stock");
 
     return -1;
 }
@@ -768,7 +769,7 @@ QVariantMap StockItemsModel::loadHistory(const QString &barcode)
         else
         {
             emit logDataChanged("CRITICAL", "Error executing SQL: " + m_db.lastError().text() + " :: " + query.lastError().text());
-            qDebug() << ">> " << query.executedQuery();
+            Logger::logError("SQL execution failed", query.executedQuery());
         }
     }
 

@@ -1,4 +1,5 @@
 #include "useraccountsmodel.h"
+#include "logger.h"
 
 #include <memory>
 
@@ -412,9 +413,8 @@ void UserAccountsModel::updatePassword(const QVariant &userUsername, const QVari
                     QString salt = p.split(":").size() >= 2 ? p.split(":").at(1) : "";
                     oldPassword = hashPassword(passwordOld.toString(), salt);
 
-                    qDebug() << "Salt: " << salt;
-
-                    qDebug() << "Old Password: " << oldPassword << "\n: " << p;
+                    Logger::logDebug("Password change: Salt generated", salt);
+                    Logger::logDebug("Password change: Old password hash", p);
 
                     if( p != oldPassword) {
 
@@ -597,10 +597,10 @@ void UserAccountsModel::updateUserAccount(const QVariant &userFirstname, const Q
             }
 
             else
-                qDebug() << "Index not found! ";
+                Logger::logWarning("User account index not found");
 
         else
-            qDebug() << "Index not found! ";
+            Logger::logWarning("User account index not found");
     }
 
     emit logDataChanged("INFO", "Ending updateUserAccount() -> Account Details");
@@ -911,11 +911,11 @@ void UserAccountsModel::removeUserAccount(int index)
 QString UserAccountsModel::hashPassword(const QString &pswd)
 {
     QString salt = QString::number(QDateTime::currentSecsSinceEpoch());
-    qDebug() << "Salt: " << salt << " :: " << salt.toUtf8();
+    Logger::logDebug("Password hash: Salt generated", salt);
     QCryptographicHash hash(QCryptographicHash::Sha3_256);
     hash.addData(pswd.toUtf8() + salt.toUtf8());
     auto hashedPassword = hash.result().toHex()+":"+salt;
-    qDebug() << hashedPassword;
+    Logger::logDebug("Password hash: Final hash generated");
     return hashedPassword;
 }
 
@@ -924,7 +924,7 @@ QString UserAccountsModel::hashPassword(const QString &pswd, const QString &salt
     QCryptographicHash hash(QCryptographicHash::Sha3_256);
     hash.addData(pswd.toUtf8() + salt.toUtf8());
     auto hashedPassword = hash.result().toHex()+":"+salt;
-    qDebug() << hashedPassword;
+    Logger::logDebug("Password hash: Final hash generated");
     return hashedPassword;
 }
 

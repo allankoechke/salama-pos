@@ -22,7 +22,7 @@ Window {
     height: 400
 
     Component.onCompleted: {
-        console.log("Loaded the Add Item Dialog!");
+        logger.debug("Loaded the Add Item Dialog!");
     }
 
     onClosing: {
@@ -261,7 +261,7 @@ Window {
 
         function onItemStockWarningChanged()
         {
-            console.log(">> Stock is less to complete this add!")
+            logger.debug(">> Stock is less to complete this add!")
             ToastModel.addToastItem("error", "Stock is less to add to Checkout")
         }
 
@@ -269,7 +269,7 @@ Window {
         {
             if(status)
             {
-                console.log(">> Item Added to Checkout Model!")
+                logger.debug(">> Item Added to Checkout Model!")
                 CheckoutModel.addSellItem(jsonObj["sellBarcode"], jsonObj["sellItemName"], jsonObj["sellItemUnit"], jsonObj["buyingPrice"], jsonObj["sellingPrice"], 1);
 
                 searchText = "";
@@ -282,7 +282,7 @@ Window {
 
             else
             {
-                console.log(">> Failed to Add Item to Checkout Model!")
+                logger.debug(">> Failed to Add Item to Checkout Model!")
                 ToastModel.addToastItem("error", "Failed to Add Item to Checkout Model")
             }
         }

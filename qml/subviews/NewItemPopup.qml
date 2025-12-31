@@ -296,14 +296,14 @@ Popup
         {
             if(status)
             {
-                console.log(" [INFO] Item Updated Successfuly!");
+                logger.debug(" [INFO] Item Updated Successfuly!");
                 ToastModel.addToastItem("info", "Item updated successfully!")
                 root.close();
             }
 
             else
             {
-                console.log(" [ERROR] Error Updating item");
+                logger.debug(" [ERROR] Error Updating item");
                 ToastModel.addToastItem("error", "Error updating item")
             }
         }
@@ -312,14 +312,14 @@ Popup
         {
             if(status)
             {
-                console.log(" [INFO] Item Deleted Successfuly!");
+                logger.debug(" [INFO] Item Deleted Successfuly!");
                 ToastModel.addToastItem("info", "Item deleted successfully!")
                 root.close();
             }
 
             else
             {
-                console.log(" [ERROR] Error Deleting item");
+                logger.debug(" [ERROR] Error Deleting item");
                 ToastModel.addToastItem("error", "Error deleting item")
             }
         }
@@ -328,14 +328,14 @@ Popup
         {
             if(status)
             {
-                console.log(" [INFO] Item Added Successfuly!");
+                logger.debug(" [INFO] Item Added Successfuly!");
                 ToastModel.addToastItem("info", "Item added successfully!")
                 root.close();
             }
 
             else
             {
-                console.log(" [ERROR] Error Adding item");
+                logger.debug(" [ERROR] Error Adding item");
                 ToastModel.addToastItem("error", "Error adding item")
             }
         }
@@ -352,7 +352,7 @@ Popup
 
             for(var i=0; i<x.length; i++)
             {
-                //console.log(">> ", x[i])
+                //logger.debug(">> ", x[i])
             }
         }
     }

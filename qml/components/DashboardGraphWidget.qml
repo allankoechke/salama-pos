@@ -84,7 +84,7 @@ Item {
 
         function onDataReadyForPlotting()
         {
-            // console.log("New plot values");
+            // logger.debug("New plot values");
 
             let csh = [], mpsa=[], cr=[], chq=[], crp=[];
 

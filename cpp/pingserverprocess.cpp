@@ -1,4 +1,5 @@
 #include "pingserverprocess.h"
+#include "logger.h"
 
 PingServerProcess::PingServerProcess(QObject *parent) : QObject(parent)
 {
@@ -12,7 +13,7 @@ void PingServerProcess::startPingCheck(const int &pingIntervalInSecs)
     // Listen for messages from the ping process
     connect(&m_pingProcess, SIGNAL(readyRead()), this, SLOT(onPingFinished()));
     connect(&m_pingProcess, &QProcess::errorOccurred, this, [=](){
-        qDebug() << "Error Occured when pinging! -> ";
+        Logger::logError("Error occurred when pinging");
     });
     // Connect the timer to the exec method that actually calls the ping process
     m_pingTimer.setInterval(pingIntervalInSecs * 1000);
@@ -65,7 +66,7 @@ void PingServerProcess::onPingFinished()
 
     if(responseStr.contains("100% loss"))
     {
-        qDebug() << "Ping failed. " << m_pingUrl << " down.";
+        Logger::logWarning(QString("Ping failed: %1 is down").arg(m_pingUrl));
         emit pingFailed();
     }
 }

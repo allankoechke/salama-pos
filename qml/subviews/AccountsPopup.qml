@@ -228,7 +228,7 @@ Controls2.Popup
                                 {
                                     anchors.fill: parent
                                     onClicked: {
-                                        // console.log("[QMl-Info] ", addUsers.isChecked, " : ", deleteUsers.isChecked, " : ", addProducts.isChecked, " : ", deleteProducts.isChecked, " : ", addStock.isChecked, " : ", deleteStock.isChecked, " : ", deleteSales.isChecked, " : ", backup.isChecked)
+                                        // logger.debug("[QMl-Info] ", addUsers.isChecked, " : ", deleteUsers.isChecked, " : ", addProducts.isChecked, " : ", deleteProducts.isChecked, " : ", addStock.isChecked, " : ", deleteStock.isChecked, " : ", deleteSales.isChecked, " : ", backup.isChecked)
                                         AccountsModel.updateUserAccount(currentUser, canAddUsers, canRemoveUsers, canAddItems, canRemoveItems, canAddStock, canDeleteStock, canUndoSales, canBackupDb);
                                     }
                                 }
@@ -248,14 +248,14 @@ Controls2.Popup
         {
             if(status)
             {
-                console.log(" [INFO] User deleted successfully!");
+                logger.debug(" [INFO] User deleted successfully!");
                 ToastModel.addToastItem("info", "User deleted successfully!")
                 root.close();
             }
 
             else
             {
-                console.log(" [ERROR] Error Deleting User");
+                logger.debug(" [ERROR] Error Deleting User");
                 ToastModel.addToastItem("error", "Error deleting user")
             }
         }
@@ -264,14 +264,14 @@ Controls2.Popup
         {
             if(status)
             {
-                console.log(" [INFO] User priviledges updated Successfuly!");
+                logger.debug(" [INFO] User priviledges updated Successfuly!");
                 ToastModel.addToastItem("info", "User privileges updated")
                 root.close();
             }
 
             else
             {
-                console.log(" [ERROR] Error Updating User Priviledges");
+                logger.debug(" [ERROR] Error Updating User Priviledges");
                 ToastModel.addToastItem("error", "User priviledges update failed")
             }
         }

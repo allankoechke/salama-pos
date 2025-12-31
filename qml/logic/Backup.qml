@@ -14,11 +14,11 @@ Item {
         args: "--dbname=postgresql://postgres:postgresdb@127.0.0.1:5432/salama"
 
         onReadyRead: {
-            console.log("Data: ", data)
+            logger.debug("Data: ", data)
         }
 
         onReadyReadError: {
-            console.log("Error: ", error)
+            logger.debug("Error: ", error)
         }
     }
 

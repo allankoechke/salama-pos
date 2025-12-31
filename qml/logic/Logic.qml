@@ -7,7 +7,7 @@ Item {
 
     function generatePriceList()
     {
-        console.log("Starting sending request ")
+        logger.debug("Starting sending request ")
         var d = StockItemModel.generatePriceList();
         var html = _generatePriceList(d);
 
@@ -26,11 +26,11 @@ Item {
                     return;
                 }
 
-                console.log("Request successful!")
+                logger.debug("Request successful!")
 
                 ToastModel.addToastItem('info', 'Price List generated successfully')
 
-                console.log(req.responseText)
+                logger.debug(req.responseText)
 
                 var obj = JSON.parse(req.responseText)
 
@@ -39,7 +39,7 @@ Item {
         }
         req.onerror = function()
         {
-            console.log("Request failed!")
+            logger.debug("Request failed!")
             ToastModel.addToastItem('error', 'Price List generation failed, try again later.')
         }
 

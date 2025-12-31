@@ -610,7 +610,7 @@ Window {
     {
         var jsonObj = SalesModel.getItemSalesDetails(selectedObject["key"], Qt.formatDate(selectedDate, "yyyy-MM-dd"))
 
-        console.log("JSON Obj: \n\t", JSON.stringify(jsonObj))
+        logger.debug("JSON Obj: \n\t", JSON.stringify(jsonObj))
 
         adminTableModel = jsonObj.data
     }

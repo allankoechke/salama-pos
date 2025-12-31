@@ -90,7 +90,7 @@ Item {
                             {
                                 ToastModel.addToastItem("error", "User has no rights to add users")
                                 QmlInterface.logToFile("WARNING", "QML => AccountsView::AddNewUser User doesnt have rights to add users")
-                                console.log("[Error] User doesnt have rights to add users")
+                                logger.debug("[Error] User doesnt have rights to add users")
                             }
                         }
                     }

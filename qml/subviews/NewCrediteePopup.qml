@@ -255,7 +255,7 @@ Popup
 
         function onIdExists()
         {
-            console.log(" [ERROR] Unique ID Constrain fails")
+            logger.debug(" [ERROR] Unique ID Constrain fails")
             ToastModel.addToastItem("error", "User ID already exists")
         }
     }

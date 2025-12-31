@@ -258,14 +258,14 @@ Controls2.Popup
                                 {
                                     if(valueQty > 0)
                                     {
-                                        console.log('Adding ', valueQty, ' to Stock.')
+                                        logger.debug('Adding ', valueQty, ' to Stock.')
                                         StockItemModel.updateStock(barcode, valueQty+currentStock, dte, currentIndex)
                                         StockItemModel.updateStockHistory(barcode, currentStock, valueQty, dte, loggedUser_username, true)
                                     }
 
                                     else
                                     {
-                                        console.log("Adding a zero qty to stock")
+                                        logger.debug("Adding a zero qty to stock")
                                         ToastModel.addToastItem("error", "Quantity is ZERO!")
                                     }
                                 }
@@ -274,7 +274,7 @@ Controls2.Popup
                                 {
                                     if( valueQty <= currentStock && valueQty>0 && hasPermissions )
                                     {
-                                        console.log("Removing ", valueQty, " from Stock.")
+                                        logger.debug("Removing ", valueQty, " from Stock.")
 
                                         StockItemModel.updateStock(barcode, currentStock-valueQty, dte, currentIndex)
                                         StockItemModel.updateStockHistory(barcode, currentStock, valueQty, dte, loggedUser_username, false)
@@ -291,7 +291,7 @@ Controls2.Popup
                                         else if( valueQty === 0 )
                                             ToastModel.addToastItem("error", "Quantity is ZERO!")
 
-                                        console.log("Removing 0 items from Stock OR Quantity to remove exceeds qty available OR You dont have permissions to do such!")
+                                        logger.debug("Removing 0 items from Stock OR Quantity to remove exceeds qty available OR You dont have permissions to do such!")
                                     }
                                 }
                             }
@@ -310,14 +310,14 @@ Controls2.Popup
         {
             if(state)
             {
-                console.log("Stock update successful!");
+                logger.debug("Stock update successful!");
                 ToastModel.addToastItem("info", "Stock update successful")
                 root.close();
             }
 
             else
             {
-                console.log("Stock update failed!");
+                logger.debug("Stock update failed!");
                 ToastModel.addToastItem("error", "Stock update failed")
             }
         }

@@ -1,4 +1,5 @@
 #include "webapiinterface.h"
+#include "logger.h"
 
 WebApiInterface::WebApiInterface(QObject *parent) : QObject(parent)
 {
@@ -24,7 +25,7 @@ void WebApiInterface::onCheckForUpdates(const int &cVersion)
 
         if(cVersion < rootObj.value("version").toInt())
         {
-            qDebug() << ">> New version is available";
+            Logger::logInfo("New version is available");
             emit newVersionAvailable(rootObj);
         }
 
@@ -141,7 +142,7 @@ void WebInterfaceRunnable::run()
 
     networkManager.connect(&networkManager, &QNetworkAccessManager::finished, &loop, &QEventLoop::quit);
     networkManager.connect(&networkManager, &QNetworkAccessManager::sslErrors, this, [=](){
-        qDebug() << "SSL Errors!";
+        Logger::logError("SSL errors occurred during network request");
     });
 
     QNetworkReply * reply = networkManager.post(request, postData);
@@ -193,7 +194,7 @@ void WebInterfaceRunnable::run()
         }
         else
         {
-            qDebug() << ">> No reply";
+            Logger::logWarning("Network request: No reply received");
 
             emit finished("Error");
         }
@@ -203,6 +204,6 @@ void WebInterfaceRunnable::run()
     {
         emit finished("Error");
 
-        qDebug() << "Timer not started";
+        Logger::logError("Network request timer not started");
     }
 }

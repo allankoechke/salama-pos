@@ -158,7 +158,7 @@ Popup
                     anchors.verticalCenter: parent.verticalCenter
 
                     onClicked: {
-                        console.log("Lower: ", lowerLimit, " - higher: ", higherLimit, " - input: ", input.text)
+                        logger.debug("Lower: ", lowerLimit, " - higher: ", higherLimit, " - input: ", input.text)
 
                         if(input.isValid)
                         {

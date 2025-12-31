@@ -2,6 +2,8 @@
 #include <QDebug>
 #include <QDateTime>
 
+Logger* Logger::s_instance = nullptr;
+
 Logger::Logger(QObject *parent) : QObject(parent)
 {
     // Ensure logs directory exists
@@ -137,5 +139,53 @@ void Logger::critical(const QString &message, const QString &longMessage)
 void Logger::fatal(const QString &message, const QString &longMessage)
 {
     log("FATAL", message, longMessage);
+}
+
+// Static instance management
+void Logger::setInstance(Logger *instance)
+{
+    s_instance = instance;
+}
+
+Logger* Logger::instance()
+{
+    return s_instance;
+}
+
+// Static convenience methods
+void Logger::logDebug(const QString &message, const QString &longMessage)
+{
+    if(s_instance)
+        s_instance->debug(message, longMessage);
+}
+
+void Logger::logInfo(const QString &message, const QString &longMessage)
+{
+    if(s_instance)
+        s_instance->info(message, longMessage);
+}
+
+void Logger::logWarning(const QString &message, const QString &longMessage)
+{
+    if(s_instance)
+        s_instance->warning(message, longMessage);
+}
+
+void Logger::logError(const QString &message, const QString &longMessage)
+{
+    if(s_instance)
+        s_instance->error(message, longMessage);
+}
+
+void Logger::logCritical(const QString &message, const QString &longMessage)
+{
+    if(s_instance)
+        s_instance->critical(message, longMessage);
+}
+
+void Logger::logFatal(const QString &message, const QString &longMessage)
+{
+    if(s_instance)
+        s_instance->fatal(message, longMessage);
 }
 

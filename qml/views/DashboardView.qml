@@ -201,13 +201,13 @@ Item {
                             {
                                 anchors.fill: parent
                                 onClicked: {
-                                    console.log("Open the SalesSummaryDialog()")
+                                    logger.debug("Open the SalesSummaryDialog()")
                                     QmlInterface.logToFile("INFO", "Open the SalesSummaryDialog()")
                                     salesSummaryDialog.show();
-                                    console.log("Load Sales for SalesSummaryDialog()")
+                                    logger.debug("Load Sales for SalesSummaryDialog()")
                                     QmlInterface.logToFile("INFO", "Load Sales for SalesSummaryDialog()")
                                     salesSummaryDialog.call_getSalesSummary()
-                                    console.log("Finished Opening SalesSummaryDialog()")
+                                    logger.debug("Finished Opening SalesSummaryDialog()")
                                     QmlInterface.logToFile("INFO", "Finished Opening SalesSummaryDialog()")
                                 }
                             }

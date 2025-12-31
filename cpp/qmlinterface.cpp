@@ -1,4 +1,5 @@
 ﻿#include "qmlinterface.h"
+#include "logger.h"
 #include <QDir>
 #include <QFileInfo>
 #include <QDesktopServices>
@@ -46,7 +47,7 @@ QmlInterface::QmlInterface(QObject *parent) : QObject(parent)
 
     if(success)
     {
-        qDebug() << "Database Creation OK";
+        Logger::logInfo("Database connection successful");
         emitDatabaseState(true, "");
         logToFile("INFO", "DatabaseInterface::initializeDatabase() => Database Connection Successful");
         setTabularData();
@@ -82,12 +83,12 @@ QmlInterface::~QmlInterface()
     if(logWriter.is_open())
         logWriter.close();
 
-    qDebug() << "Exitting from QmlInterface Destructor!";
+    Logger::logInfo("QmlInterface destructor called");
 }
 
 void QmlInterface::emitDatabaseState(const bool &state, const QString &status)
 {
-    qDebug() << "Database Initialization: State = " << state;
+    Logger::logInfo(QString("Database initialization state changed: %1").arg(state ? "Connected" : "Disconnected"));
 
     emit databaseReadyChanged(state, status);
 
@@ -428,12 +429,9 @@ void QmlInterface::getDashboardTableData()
             credit.append(_credit);
             credit_paid.append(_credit_paid);
 
-            qDebug() << "\n" << dt_str << " Statistics: ";
-            qDebug() << "\tCash Sales: " << _cash;
-            qDebug() << "\tMpesa Sales: " << _mpesa;
-            qDebug() << "\tCheque Sales: " << _cheque;
-            qDebug() << "\tCredit Taken: " << _credit;
-            qDebug() << "\tCredit Paid: " << _credit_paid;
+            QString statsMsg = QString("%1 Statistics: Cash=%2, Mpesa=%3, Cheque=%4, Credit=%5, CreditPaid=%6")
+                .arg(dt_str).arg(_cash).arg(_mpesa).arg(_cheque).arg(_credit).arg(_credit_paid);
+            Logger::logInfo("Sales statistics", statsMsg);
 
         }
 
@@ -510,13 +508,13 @@ void QmlInterface::onNewVersionAvailable(const QJsonObject &json)
     if(QFileInfo::exists(r_path))
     {
         emit downloadFinished(r_path);
-        qDebug() << ">> File already downloaded, ready to install";
+        Logger::logInfo("Update file already downloaded, ready to install");
     }
 
     else
     {
         emit newVersionAvailableChanged(json.value("versionString").toString());
-        qDebug() << ">> Update ready, start download";
+        Logger::logInfo("Update ready, start download");
     }
 }
 
@@ -574,7 +572,7 @@ void QmlInterface::onLogsTimerTimeout()
 
     setLogFileName(path.toStdString());
 
-    qDebug() << "File Name: " << path;
+    Logger::logDebug("Log file name", path);
 }
 
 void QmlInterface::onInternetConnectionStatusChanged(bool state)
@@ -624,14 +622,14 @@ void QmlInterface::downloadUpdate()
     /// Start update download for a newer version
     /// If update started,
 
-    qDebug() << ">> Downloading Update";
+    Logger::logInfo("Starting update download");
+    QString updateLink = m_UpdateJSON.value("link").toString();
 
     QNetworkAccessManager * network = new QNetworkAccessManager(this);
-    QUrl url(m_UpdateJSON.value("link").toString());
+    QUrl url(updateLink);
     QNetworkRequest request(url);
 
-    // QJsonDocument doc(m_UpdateJSON);
-    qDebug() << m_UpdateJSON.value("link").toString();
+    Logger::logDebug("Update download URL", updateLink);
     QString pth = m_path+"/downloads/"+m_UpdateJSON.value("filename").toString();
 
     emit downloadStarted();
@@ -644,14 +642,14 @@ void QmlInterface::downloadUpdate()
         {
             file.write(app);
             file.close();
-            qDebug() << "Update download finished!";
+            Logger::logInfo("Update download finished");
 
             emit downloadFinished(m_UpdateJSON.value("filename").toString());
         }
 
         else
         {
-            qDebug() << "Couldn't open file! " << file.errorString();
+            Logger::logError("Failed to open update file", file.errorString());
         }
 
 
@@ -816,20 +814,20 @@ void QmlInterface::setTabularData()
 
                 if(query.exec(sql))
                 {
-                    qDebug() << "[INFO] All DB is set up!";
+                    Logger::logInfo("Database setup completed");
                     m_settings->setValue("Config/isDbSetUp", true); // Save the new state
                 }
 
                 else
-                    qDebug() << "[ERROR] Stock Data Exec: " << query.lastError().text();
+                    Logger::logError("Stock data execution failed", query.lastError().text());
             }
 
             else
-                qDebug() << "[ERROR] Item Data Exec: " << query.lastError().text();
+                Logger::logError("Item data execution failed", query.lastError().text());
         }
 
         else
-            qDebug() << "[ERROR] Type Data Exec: " << query.lastError().text();
+            Logger::logError("Type data execution failed", query.lastError().text());
     }
 
 
@@ -1135,45 +1133,35 @@ void QmlInterface::setVersionInt(int versionInt)
 
 void QmlInterface::logToFile(const QString &level, const QString &log)
 {
+    // Delegate to Logger for consistent formatting
     if(level == "INFO")
     {
-        qInfo() << "INFO\t->" << log;
-    } else if (level == "CRITICAL")
-    {
-        qCritical() << "CRITICAL\t->" + log;
-    } else if (level == "FATAL")
-    {
-        QString s = "FATAL\t->" + log;
-        std::string s_std= s.toStdString();
-        const char* err = s_std.c_str();
-        qFatal(err);
-    } else {
-        qDebug() << "DEBUG\t->" << log;
+        Logger::logInfo(log);
     }
-
-    try
+    else if(level == "DEBUG")
     {
-        if(!logWriter.is_open())
-        {
-            QString logName = QDateTime::currentDateTime().toString("yyyy-MM-dd")+"_app.log";
-            logWriter.open((m_logsPath+"/"+logName).toStdString(), std::ios::out | std::ios::app | std::ios::binary | std::ios::ate);
-
-            QString content=QString("%1 \t [%2]\tLog: %3 \r\n").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh:mm:ss.z"), level, log);
-            logWriter << content.toStdString();
-            logWriter.close();
-        }
-
-        else
-        {
-            QString content=QString("%1 \t [%2]\tLog: %3 \r\n").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh:mm:ss.z"), level, log);
-            logWriter << content.toStdString();
-            logWriter.close();
-        }
+        Logger::logDebug(log);
     }
-
-    catch(...)
+    else if(level == "WARNING")
     {
-        qDebug() << "Log Writer Threw an Error!";
+        Logger::logWarning(log);
+    }
+    else if(level == "ERROR")
+    {
+        Logger::logError(log);
+    }
+    else if(level == "CRITICAL")
+    {
+        Logger::logCritical(log);
+    }
+    else if(level == "FATAL")
+    {
+        Logger::logFatal(log);
+    }
+    else
+    {
+        // Default to info for unknown levels
+        Logger::logInfo(log);
     }
 }
 
@@ -1183,6 +1171,6 @@ void QmlInterface::openLocation(const QString &path)
     p.removeLast();
     auto r = p.join('/');
 
-    qDebug() << "Folder: " << r;
+    Logger::logDebug("Opening folder location", r);
     QDesktopServices::openUrl(r);
 }

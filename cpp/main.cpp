@@ -61,12 +61,12 @@ int main(int argc, char *argv[])
         }
         else
         {
-            qDebug() << "Could not retrieve font family from loaded font!";
+            Logger::logWarning("Could not retrieve font family from loaded font");
         }
     }
     else
     {
-        qDebug() << "Could not load the specified font!";
+        Logger::logWarning("Could not load the specified font");
     }
 
     // Make sure there is no other instance running
@@ -89,8 +89,9 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("AppVersionPatch", SALAMA_POS_VERSION_PATCH);
     engine.rootContext()->setContextProperty("AppVersionNickname", SALAMA_POS_VERSION_NICKNAME);
     
-    // Expose logger to QML
+    // Create and expose logger to QML and C++
     Logger logger;
+    Logger::setInstance(&logger);
     engine.rootContext()->setContextProperty("logger", &logger);
 
     UserAccountsModel m_userAccounts;

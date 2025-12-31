@@ -167,7 +167,7 @@ Item {
                         else
                         {
                             ToastModel.addToastItem("error", "User has no rights to add items")
-                            console.log(" [ERROR] User has no rights to add item")
+                            logger.debug(" [ERROR] User has no rights to add item")
                         }
                     }
                 }

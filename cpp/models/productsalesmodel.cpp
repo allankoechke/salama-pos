@@ -1,4 +1,5 @@
 #include "productsalesmodel.h"
+#include "logger.h"
 
 ProductSalesModel::ProductSalesModel(QObject *parent) : QAbstractListModel(parent)
 {
@@ -189,7 +190,7 @@ void ProductSalesModel::loadSalesData()
     QSqlDatabase mdb = QSqlDatabase::database();
 
     if(!mdb.isOpen())
-        qDebug() << "[ERROR] Database not open/ready yet!";
+        Logger::logError("Database not open/ready yet");
 
     else
     {

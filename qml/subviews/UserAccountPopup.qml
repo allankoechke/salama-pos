@@ -241,7 +241,7 @@ Popup
                                                 {
                                                     isError = true;
                                                     errorText = qsTr("Passwords do not match")
-                                                    console.log("Passwords do not match")
+                                                    logger.debug("Passwords do not match")
                                                     ToastModel.addToastItem("error", "Passwords do not match!")
                                                 }
                                             }
@@ -286,14 +286,14 @@ Popup
         {
             if(status)
             {
-                console.log(" [INFO] User Added Successfuly!");
+                logger.debug(" [INFO] User Added Successfuly!");
                 ToastModel.addToastItem("info", "New user added successfully!")
                 root.close();
             }
 
             else
             {
-                console.log(" [ERROR] Error Adding User");
+                logger.debug(" [ERROR] Error Adding User");
                 ToastModel.addToastItem("error", "Error adding user")
             }
         }
@@ -302,7 +302,7 @@ Popup
         {
             if(status)
             {
-                console.log(" [INFO] User Details updated Successfuly!");
+                logger.debug(" [INFO] User Details updated Successfuly!");
                 ToastModel.addToastItem("info", "User details updated!")
                 // resetFields();
                 root.close();
@@ -310,14 +310,14 @@ Popup
 
             else
             {
-                console.log(" [ERROR] Error Updating User");
+                logger.debug(" [ERROR] Error Updating User");
                 ToastModel.addToastItem("error", "Error updating users")
             }
         }
 
         function onUsernameExistsChanged(status)
         {
-            console.log(">> [ERROR] Username taken")
+            logger.debug(">> [ERROR] Username taken")
             ToastModel.addToastItem("warning", "The username is already taken")
             isError = true;
             errorText = qsTr("The username is already taken!")

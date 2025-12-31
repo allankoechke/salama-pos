@@ -29,7 +29,7 @@ Window {
 
     Component.onCompleted: {
         cb.currentIndex = 0;
-        console.log("Finished loading sales summary")
+        logger.debug("Finished loading sales summary")
         QmlInterface.logToFile("INFO", "QML => Finished loading sales summary")
     }
 

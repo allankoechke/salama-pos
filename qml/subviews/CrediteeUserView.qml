@@ -259,7 +259,7 @@ Item
 
         function onPaymentReceived(date, paid, due)
         {
-            // console.log("History Added: ", date, " ", paid, " ", due)
+            // logger.debug("History Added: ", date, " ", paid, " ", due)
 
             crediteePaymentModel.append(JSON.parse('{
             "_paid":' + paid + ',

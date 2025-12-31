@@ -89,7 +89,7 @@ Controls2.Popup
                         property real to: 0
 
                         onValueChanged: {
-                            console.log('Value changed: ', value, ', Int: ', parseInt(qtySpinbox.value))
+                            logger.debug('Value changed: ', value, ', Int: ', parseInt(qtySpinbox.value))
                         }
                     }
                 }
@@ -166,9 +166,9 @@ Controls2.Popup
                         {
                             anchors.fill: parent
                             onClicked: {
-                                console.log(">> Updating Stock: ", barcode)
+                                logger.debug(">> Updating Stock: ", barcode)
 
-                                console.log("Value", parseInt(qtySpinbox.value), "From: ", qtySpinbox.from, ", To: ", qtySpinbox.to)
+                                logger.debug("Value", parseInt(qtySpinbox.value), "From: ", qtySpinbox.from, ", To: ", qtySpinbox.to)
 
                                 if( parseInt(qtySpinbox.value) < from || qtySpinbox.value==='' )
                                     ToastModel.addToastItem("error", "Quantity CANT be ZERO!")
@@ -194,14 +194,14 @@ Controls2.Popup
         {
             if(state)
             {
-                console.log("Sale Qty Update successful!");
+                logger.debug("Sale Qty Update successful!");
                 ToastModel.addToastItem("info", "Quantity added successfully")
                 root.close();
             }
 
             else
             {
-                console.log("Sale Qty failed!");
+                logger.debug("Sale Qty failed!");
                 ToastModel.addToastItem("error", "Quantity add failed")
             }
         }

@@ -1,4 +1,5 @@
 #include "crediteeaccountsmodel.h"
+#include "logger.h"
 
 CrediteeAccountsModel::CrediteeAccountsModel(QObject *parent) : QAbstractListModel(parent)
 {
@@ -309,7 +310,7 @@ void CrediteeAccountsModel::loadCrediteeAccounts()
 
     else
     {
-        qDebug() << " [ERROR] Database not open!";
+        Logger::logError("Database not open");
     }
 
     emit logDataChanged("INFO", "Ending CrediteeAccountsModel::loadCrediteeAccounts()");
@@ -359,7 +360,7 @@ void CrediteeAccountsModel::getPaymentHistory(const QString &idNo)
 
     else
     {
-        qDebug() << " [ERROR] Database not open!";
+        Logger::logError("Database not open");
     }
 
     emit logDataChanged("INFO", "Ending CrediteeAccountsModel::getPaymentHistory()");
@@ -438,7 +439,7 @@ bool CrediteeAccountsModel::repayDebt(const QString &crediteeId, const int &debt
 
     else
     {
-        qDebug() << " [ERROR] Database not open!";
+        Logger::logError("Database not open");
     }
 
     db.rollback();

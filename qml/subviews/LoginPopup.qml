@@ -163,7 +163,7 @@ Controls2.Popup
                         {
                             anchors.fill: parent
                             onClicked: {
-                                console.log(">> Updating Stock: ", barcode)
+                                logger.debug(">> Updating Stock: ", barcode)
 
                                 CheckoutModel.changeSellStock(qtySpinbox.value, barcode);
                             }

@@ -74,7 +74,7 @@ Rectangle {
                             else
                             {
                                 ToastModel.addToastItem("error", "User has no priviledges to perform action")
-                                console.log(" [ERROR] User has no priviledges to perform action")
+                                logger.debug(" [ERROR] User has no priviledges to perform action")
                             }
                         }
 

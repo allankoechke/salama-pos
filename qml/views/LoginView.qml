@@ -173,20 +173,20 @@ Item {
                 {
                     isError = true
                     errorString = qsTr("Invalid login details")
-                    console.log("Username doesnt exist")
+                    logger.debug("Username doesnt exist")
                     ToastModel.addToastItem("error", "Invalid login credentials")
                 }
             }
 
             function onLoggingInPasswordStatus(status)
             {
-                // console.log("Status: ", status)
+                // logger.debug("Status: ", status)
 
                 if(!status)
                 {
                     isError = true
                     errorString = qsTr("Invalid login details")
-                    console.log(" [ERROR] Wrong Password")
+                    logger.debug(" [ERROR] Wrong Password")
                     ToastModel.addToastItem("error", "Invalid password")
                 }
 

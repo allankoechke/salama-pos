@@ -169,7 +169,7 @@ Rectangle {
                                 anchors.fill: parent
                                 height: 30
                                 onClicked: {
-                                    console.log(">> Download update")
+                                    logger.debug(">> Download update")
                                     QmlInterface.downloadUpdate()
                                 }
                             }
@@ -198,7 +198,7 @@ Rectangle {
                             {
                                 anchors.fill: parent
                                 onClicked: {
-                                    console.log("Install")
+                                    logger.debug("Install")
                                     messageBoxUpdate.open();
                                 }
                             }
@@ -235,7 +235,7 @@ Rectangle {
         id: messageBoxUpdate
         text: qsTr("Start the update? Changes will appear after the app is restarted.")
         onAccepted: {
-            console.log("Starting update ...")
+            logger.debug("Starting update ...")
             QmlInterface.logToFile("INFO", "QML => MainAppView::getUpdate Starting Update")
             QmlInterface.installUpdate();
             messageBoxUpdate.close();
@@ -255,7 +255,7 @@ Rectangle {
     UserMenuPopup
     {
         id: userMenuPopup
-        // onOpened: console.log("Opened")
+        // onOpened: logger.debug("Opened")
     }
 
     NewItemPopup

@@ -1,4 +1,5 @@
 #include "databaseinterface.h"
+#include "logger.h"
 
 #include <QDir>
 #include <QProcessEnvironment>
@@ -21,11 +22,9 @@ void DatabaseInterface::loadCredentialsFromEnvironment()
     // (useful for trust/peer authentication or development environments)
     db_pswd = env.value("S_DB_PASSWORD");
     
-    qDebug() << "Database configuration loaded:";
-    qDebug() << "  Host:" << db_host;
-    qDebug() << "  Username:" << db_uname;
-    qDebug() << "  Database:" << db_name;
-    qDebug() << "  Password:" << (db_pswd.isEmpty() ? "Not set (no password authentication)" : "Set");
+    QString configMsg = QString("Host: %1, Username: %2, Database: %3, Password: %4")
+        .arg(db_host, db_uname, db_name, db_pswd.isEmpty() ? "Not set" : "Set");
+    Logger::logDebug("Database configuration loaded", configMsg);
 }
 
 
@@ -80,7 +79,7 @@ bool DatabaseInterface::initializeDatabase()
             {
                 m_db.rollback();
                 m_lastError = QString("Error executing SQL: %1").arg(query.lastError().text());
-                qDebug() << "Error executing SQL: " << query.lastError().text();
+                Logger::logError("SQL execution failed", query.lastError().text());
                 emit connectionError(m_lastError);
                 return false;
             }

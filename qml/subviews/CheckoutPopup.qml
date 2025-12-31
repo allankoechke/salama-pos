@@ -368,8 +368,8 @@ Controls2.Drawer {
                                         json.cheque = chequeAmount
 
 
-                                        console.log(cashAmount-getBalance())
-                                        console.log(">> Payment Done: ", JSON.stringify(json));
+                                        logger.debug(cashAmount-getBalance())
+                                        logger.debug(">> Payment Done: ", JSON.stringify(json));
 
 
 
@@ -379,7 +379,7 @@ Controls2.Drawer {
 
                                     else
                                     {
-                                        console.log(" [ERROR] Paid amont is less than the required amount")
+                                        logger.debug(" [ERROR] Paid amont is less than the required amount")
                                         ToastModel.addToastItem("error", "Amount paid is less than owed")
                                     }
                                 }
@@ -421,12 +421,12 @@ Controls2.Drawer {
         {
             if(status)
             {
-                console.log(">> Success Adding Credit Details")
+                logger.debug(">> Success Adding Credit Details")
             }
 
             else
             {
-                console.log(">> Error Adding Credit Details")
+                logger.debug(">> Error Adding Credit Details")
             }
         }
 
@@ -441,7 +441,7 @@ Controls2.Drawer {
                     if(parseInt(mpesaAmount) > 0)
                     {
                         var dt_ = SalesModel.generateMpesaId();
-                        // console.log("Mpesa ID: ", dt_)
+                        // logger.debug("Mpesa ID: ", dt_)
                         SalesModel.addMpesaSale(dt_, uniqueSaleId);
                     }
 
@@ -450,7 +450,7 @@ Controls2.Drawer {
                         SalesModel.addCreditSale(crediteeIdNo, SalesModel.getDayFromToday(7), uniqueSaleId, parseInt(creditAmount));
                     }
 
-                    console.log(" [INFO] Success Adding Sale Items : " , counter)
+                    logger.debug(" [INFO] Success Adding Sale Items : " , counter)
 
                     CheckoutModel.startANewSell();
                     root.close();
@@ -472,7 +472,7 @@ Controls2.Drawer {
 
             else
             {
-                console.log(" [ERROR] Error Adding Sale Items")
+                logger.debug(" [ERROR] Error Adding Sale Items")
                 ToastModel.addToastItem("error", "Error adding sale item")
             }
         }
@@ -481,7 +481,7 @@ Controls2.Drawer {
         {
             if(status)
             {
-                console.log(" [INFO] Success Payment Details")
+                logger.debug(" [INFO] Success Payment Details")
 
                 for(var i=0; i<CheckoutModel.checkoutModelSize; i++)
                 {
@@ -497,7 +497,7 @@ Controls2.Drawer {
 
             else
             {
-                console.log(" [ERROR] Error Adding Payment Details")
+                logger.debug(" [ERROR] Error Adding Payment Details")
                 ToastModel.addToastItem("error", "Error adding payment details")
             }
         }
@@ -519,7 +519,7 @@ Controls2.Drawer {
 
         function onAccepted()
         {
-            // console.log("Accepted at : ", selectCrediteeOnSale.selectedCreditee)
+            // logger.debug("Accepted at : ", selectCrediteeOnSale.selectedCreditee)
             crediteeIdNo = selectCrediteeOnSale.selectedCreditee
             isCrediteeSelected = true;
         }

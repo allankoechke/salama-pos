@@ -147,23 +147,23 @@ Window {
 
         function onIsInternetConnectedChanged(state)
         {
-            console.log(state? "Internet is UP":"Internet is DOWN")
+            logger.debug(state? "Internet is UP":"Internet is DOWN")
             logger.info(state? "Connected to Internet":"Disconnected from the Internet")
         }
 
         function onDatabaseLoadedChanged(state)
         {
-            console.log("database loaded? " , state)
+            logger.debug("database loaded? " , state)
         }
 
         function onDatabaseConnectionErrorStringChanged(err)
         {
-            console.log("Error Str: ", err)
+            logger.debug("Error Str: ", err)
         }
 
         function onDatabaseReadyChanged(state, err)
         {
-            console.log(">> Database Ready Signal in QML!")
+            logger.debug(">> Database Ready Signal in QML!")
 
             // databaseConnStatus = state
             // databaseConnStatusStr = state? "DB Connected":"DB Connection Error"
@@ -171,12 +171,12 @@ Window {
 
         function onLogFileNameChanged(logFileName)
         {
-            console.log(">> Log File Name Changed")
+            logger.debug(">> Log File Name Changed")
         }
 
         function onDatabaseConnectionChanged(state, msg)
         {
-            console.log(">> Database Conn Changed")
+            logger.debug(">> Database Conn Changed")
         }
     }
 
@@ -192,15 +192,15 @@ Window {
         function onUserAccountsLoaded(status)
         {
             if(status)
-                console.log(">> User Accounts have been loaded");
+                logger.debug(">> User Accounts have been loaded");
 
             else
-                console.log(">> Error loading user accounts");
+                logger.debug(">> Error loading user accounts");
         }
 
         function onLogged_inUserChanged()
         {
-            console.log(" [QML-INFO] Logged in user changed ...")
+            logger.debug(" [QML-INFO] Logged in user changed ...")
         }
 
         function onLoggedInUserChanged(json)
