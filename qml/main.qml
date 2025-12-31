@@ -143,45 +143,6 @@ Window {
 
     Connections
     {
-        target: QmlInterface
-
-        function onIsInternetConnectedChanged(state)
-        {
-            logger.debug(state? "Internet is UP":"Internet is DOWN")
-            logger.info(state? "Connected to Internet":"Disconnected from the Internet")
-        }
-
-        function onDatabaseLoadedChanged(state)
-        {
-            logger.debug("database loaded? " , state)
-        }
-
-        function onDatabaseConnectionErrorStringChanged(err)
-        {
-            logger.debug("Error Str: ", err)
-        }
-
-        function onDatabaseReadyChanged(state, err)
-        {
-            logger.debug(">> Database Ready Signal in QML!")
-
-            // databaseConnStatus = state
-            // databaseConnStatusStr = state? "DB Connected":"DB Connection Error"
-        }
-
-        function onLogFileNameChanged(logFileName)
-        {
-            logger.debug(">> Log File Name Changed")
-        }
-
-        function onDatabaseConnectionChanged(state, msg)
-        {
-            logger.debug(">> Database Conn Changed")
-        }
-    }
-
-    Connections
-    {
         target: AccountsModel
 
         function onLogDataChanged(level, info)
@@ -192,15 +153,15 @@ Window {
         function onUserAccountsLoaded(status)
         {
             if(status)
-                logger.debug(">> User Accounts have been loaded");
+                logger.debug("[QML] User Accounts have been loaded");
 
             else
-                logger.debug(">> Error loading user accounts");
+                logger.debug("[QML] Error loading user accounts");
         }
 
         function onLogged_inUserChanged()
         {
-            logger.debug(" [QML-INFO] Logged in user changed ...")
+            logger.debug("[QML] Logged in user changed ...")
         }
 
         function onLoggedInUserChanged(json)
@@ -223,7 +184,7 @@ Window {
 
             isAdmin = loggedUser_canAddAccounts && loggedUser_canDeleteAccounts && loggedUser_canAddItems && loggedUser_canDeleteItems && loggedUser_canAddStock && loggedUser_canDeleteStock && loggedUser_canUndoSales && loggedUser_canBackupDb
 
-            logger.info("User logged in", "Username: " + loggedUser_username)
+            logger.info("User logged in", `Username: ${loggedUser_username}`)
         }
     }
 

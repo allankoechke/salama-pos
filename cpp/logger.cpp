@@ -75,35 +75,33 @@ void Logger::log(const QString &level, const QString &shortMessage, const QStrin
         logLine += QString("\n\t> %1").arg(longMessage);
     }
     
-    logLine += "\n";
-    
     // Write to file
     if(m_logWriter.is_open())
     {
-        m_logWriter << logLine.toStdString();
+        m_logWriter << (logLine+"\n").toStdString();
         m_logWriter.flush();
     }
     
     // Also output to console with appropriate Qt logging
     if(level == "DEBUG")
     {
-        qDebug() << logLine.trimmed();
+        qDebug().noquote() << logLine;
     }
     else if(level == "INFO")
     {
-        qInfo() << logLine.trimmed();
+        qInfo().noquote() << logLine;
     }
     else if(level == "WARNING")
     {
-        qWarning() << logLine.trimmed();
+        qWarning().noquote() << logLine;
     }
     else if(level == "ERROR")
     {
-        qCritical() << logLine.trimmed();
+        qCritical().noquote() << logLine;
     }
     else if(level == "CRITICAL")
     {
-        qCritical() << logLine.trimmed();
+        qCritical().noquote() << logLine;;
     }
     else if(level == "FATAL")
     {
