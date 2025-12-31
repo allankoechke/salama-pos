@@ -46,6 +46,7 @@ configure_file(
 
 qt_add_executable(salamapos
     cpp/main.cpp
+    cpp/backendmanager.cpp
     cpp/databaseinterface.cpp
     cpp/datetime.cpp
     cpp/logger.cpp

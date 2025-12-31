@@ -20,6 +20,7 @@
 #include "version.h"
 #include "qmlinterface.h"
 #include "logger.h"
+#include "backendmanager.h"
 #include "models/stockitemsmodel.h"
 #include "models/checkoutitemsmodel.h"
 #include "models/useraccountsmodel.h"
@@ -93,8 +94,21 @@ int main(int argc, char *argv[])
     Logger logger;
     Logger::setInstance(&logger);
     engine.rootContext()->setContextProperty("logger", &logger);
+    
+    // Create and expose BackendManager
+    BackendManager backendManager;
+    engine.rootContext()->setContextProperty("BackendManager", &backendManager);
+    
+    // Check backend health and start if needed
+    backendManager.checkHealth();
+    QTimer::singleShot(2000, [&backendManager]() {
+        if (!backendManager.isBackendRunning()) {
+            Logger::logInfo("Backend not running, attempting to start...");
+            backendManager.startBackend();
+        }
+    });
 
-    UserAccountsModel m_userAccounts;
+    UserAccountsModel m_userAccounts(&backendManager);
 
     // Singletons
     QmlInterface qmlInterface;

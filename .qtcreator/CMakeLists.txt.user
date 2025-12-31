@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 18.0.1, 2025-12-30T15:10:27. -->
+<!-- Written by QtCreator 18.0.1, 2026-01-01T00:24:49. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -105,16 +105,16 @@
     <value type="int" key="CMake.Configure.BaseEnvironment">2</value>
     <value type="bool" key="CMake.Configure.ClearSystemEnvironment">false</value>
     <valuelist type="QVariantList" key="CMake.Configure.UserEnvironmentChanges"/>
-    <value type="QString" key="CMake.Initial.Parameters">-DQT_MAINTENANCE_TOOL:FILEPATH=/home/codeart/Qt/MaintenanceTool
+    <value type="QString" key="CMake.Initial.Parameters">-DQT_QMAKE_EXECUTABLE:FILEPATH=%{Qt:qmakeExecutable}
+-DCMAKE_PREFIX_PATH:PATH=%{Qt:QT_INSTALL_PREFIX}
 -DCMAKE_COLOR_DIAGNOSTICS:BOOL=ON
--DCMAKE_CXX_FLAGS_INIT:STRING=%{Qt:QML_DEBUG_FLAG}
--DCMAKE_GENERATOR:STRING=Unix Makefiles
 -DCMAKE_BUILD_TYPE:STRING=Debug
--DCMAKE_CXX_COMPILER:FILEPATH=%{Compiler:Executable:Cxx}
--DQT_QMAKE_EXECUTABLE:FILEPATH=%{Qt:qmakeExecutable}
--DCMAKE_C_COMPILER:FILEPATH=%{Compiler:Executable:C}
+-DQT_MAINTENANCE_TOOL:FILEPATH=/home/codeart/Qt/MaintenanceTool
+-DCMAKE_GENERATOR:STRING=Unix Makefiles
+-DCMAKE_CXX_FLAGS_INIT:STRING=%{Qt:QML_DEBUG_FLAG}
 -DCMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=%{BuildConfig:BuildDirectory:NativeFilePath}/.qtc/package-manager/auto-setup.cmake
--DCMAKE_PREFIX_PATH:PATH=%{Qt:QT_INSTALL_PREFIX}</value>
+-DCMAKE_C_COMPILER:FILEPATH=%{Compiler:Executable:C}
+-DCMAKE_CXX_COMPILER:FILEPATH=%{Compiler:Executable:Cxx}</value>
     <value type="int" key="EnableQmlDebugging">0</value>
     <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/mnt/wspace/Repos/qt-projects/salama-pos/build/Desktop_Qt_6_10_1-Debug</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
@@ -247,7 +247,7 @@
      <value type="QString" key="PerfRecordArgsId">-e cpu-cycles --call-graph dwarf,4096 -F 250</value>
      <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">CMakeProjectManager.CMakeRunConfiguration.</value>
-     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">mantisbased</value>
+     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">mantisbase_app</value>
      <value type="bool" key="ProjectExplorer.RunConfiguration.Customized">false</value>
      <value type="QString" key="ProjectExplorer.RunConfiguration.UniqueId"></value>
      <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
@@ -267,7 +267,7 @@
      <value type="QString" key="PerfRecordArgsId">-e cpu-cycles --call-graph dwarf,4096 -F 250</value>
      <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">CMakeProjectManager.CMakeRunConfiguration.</value>
-     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">mantisbase_app</value>
+     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">salama-pos-backend</value>
      <value type="bool" key="ProjectExplorer.RunConfiguration.Customized">false</value>
      <value type="QString" key="ProjectExplorer.RunConfiguration.UniqueId"></value>
      <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
@@ -360,7 +360,7 @@
     <value type="QString" key="PerfRecordArgsId">-e cpu-cycles --call-graph dwarf,4096 -F 250</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">CMakeProjectManager.CMakeRunConfiguration.</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">mantisbased</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">mantisbase_app</value>
     <value type="bool" key="ProjectExplorer.RunConfiguration.Customized">false</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.UniqueId"></value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
@@ -380,7 +380,7 @@
     <value type="QString" key="PerfRecordArgsId">-e cpu-cycles --call-graph dwarf,4096 -F 250</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">CMakeProjectManager.CMakeRunConfiguration.</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">mantisbase_app</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">salama-pos-backend</value>
     <value type="bool" key="ProjectExplorer.RunConfiguration.Customized">false</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.UniqueId"></value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>

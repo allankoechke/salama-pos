@@ -16,6 +16,8 @@
 #include "src/useraccounts.h"
 #include "../datetime.h"
 
+class BackendManager;
+
 class UserAccountsModel : public QAbstractListModel
 {
     Q_OBJECT
@@ -41,6 +43,7 @@ class UserAccountsModel : public QAbstractListModel
 
 public:
     explicit UserAccountsModel(QObject *parent = nullptr);
+    explicit UserAccountsModel(BackendManager *backendManager, QObject *parent = nullptr);
 
     // QAbstractListModel overrides
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -129,12 +132,19 @@ signals:
 
     void logDataChanged(QString level, QString info);
 
+private slots:
+    void onApiResponse(const QString &endpoint, const QJsonObject &response);
+    void onApiError(const QString &error);
+    void onLoginResponse(const QJsonObject &response);
+
 private:
     QList<UserAccounts *> mUserAccounts;
 
     QJsonObject m_loggedInUser, m_status;
 
     DateTime * m_dateTime;
+    BackendManager *m_backendManager;
+    QString m_pendingEndpoint;
 };
 
 #endif // USERACCOUNTSMODEL_H

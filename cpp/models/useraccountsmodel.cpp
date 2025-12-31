@@ -3,9 +3,11 @@
 
 #include <memory>
 
-UserAccountsModel::UserAccountsModel(QObject *parent) : QAbstractListModel(parent)
+UserAccountsModel::UserAccountsModel(QObject *parent) 
+    : QAbstractListModel(parent)
+    , m_dateTime(new DateTime())
+    , m_backendManager(nullptr)
 {
-
     QFile file(":/json/logged_user.json");
     file.open(QIODevice::ReadOnly|QIODevice::Text);
     QString jsonString = file.readAll();
@@ -21,8 +23,6 @@ UserAccountsModel::UserAccountsModel(QObject *parent) : QAbstractListModel(paren
 
     QJsonDocument docStatus = QJsonDocument::fromJson(jsonStatus.toUtf8());
     m_status = docStatus.object();
-
-    m_dateTime = new DateTime();
 }
 
 int UserAccountsModel::rowCount(const QModelIndex &parent) const
@@ -323,65 +323,31 @@ void UserAccountsModel::addNewUserAccount(const QVariant &userFirstname, const Q
 {
     emit logDataChanged("INFO", "Starting AddNewUserAccount()");
 
-    Q_UNUSED(userDateAdded)
+    if (!m_backendManager) {
+        emit logDataChanged("ERROR", "BackendManager not available");
+        emit userAddedChanged(false);
+        return;
+    }
 
     if(getUserIndex(userUsername.toString()) != -1)
     {
         emit usernameExistsChanged(true);
-
-        // qDebug() << ">> Duplicate username ...";
-
         emit logDataChanged("WARNING", "Username entered exists in the database");
+        return;
     }
 
-    else
-    {
-        QString dateToday = m_dateTime->getTimestamp("now").at(0);
-        QSqlDatabase m_db = QSqlDatabase::database();
-
-        QString password = hashPassword(userPassword.toString());
-
-        if(m_db.isOpen())
-        {
-            QSqlQuery query;
-            query.prepare("INSERT INTO \"users\"(firstname,lastname,username,password,phone_no,date_added) VALUES (:firstname,:lastname,:username,:password,:phone_no,:date_added)");
-            query.bindValue(":firstname", userFirstname.toString());
-            query.bindValue(":lastname", userLastname.toString());
-            query.bindValue(":username", userUsername.toString());
-            query.bindValue(":password", password);
-            query.bindValue(":phone_no", userPhoneNo.toString());
-            query.bindValue(":date_added", dateToday);
-
-            QSqlQuery priviledges_query;
-            priviledges_query.prepare("INSERT INTO \"priviledges\"(username) VALUES (:username)");
-            priviledges_query.bindValue(":username", userUsername.toString());
-
-            if(query.exec() && priviledges_query.exec())
-            {
-                m_db.commit();
-
-                // qDebug() << ">> New User Added";
-
-                addNewUserAccount(new UserAccounts(userFirstname.toString(), userLastname.toString(), userUsername.toString(), userPhoneNo.toString(), password, dateToday, true, false, true, false, true, false, false, false, false, getUserRoleAsAString(true, false, true, false, true, false, false, false)));
-
-                emit userAddedChanged(true);
-
-                emit logDataChanged("INFO", "New User Account Added Successfully");
-
-            }
-
-            else
-            {
-                m_db.rollback();
-
-                emit userAddedChanged(false);
-
-                QString errorStr = "Error executing SQL: " + query.lastError().text() + " :: " + priviledges_query.lastError().text();
-
-                emit logDataChanged("CRITICAL", errorStr);
-            }
-        }
-    }
+    QString dateToday = userDateAdded.toString().isEmpty() ? m_dateTime->getTimestamp("now").at(0) : userDateAdded.toString();
+    
+    QJsonObject data;
+    data["firstname"] = userFirstname.toString();
+    data["lastname"] = userLastname.toString();
+    data["username"] = userUsername.toString();
+    data["password"] = userPassword.toString(); // Backend will hash it
+    data["phone_no"] = userPhoneNo.toString();
+    data["date_added"] = dateToday;
+    
+    m_pendingEndpoint = "/api/v1/salamapos/users";
+    m_backendManager->postRequest(m_pendingEndpoint, data);
 
     emit logDataChanged("INFO", "Ending AddNewUserAccount()");
 }
@@ -390,143 +356,36 @@ void UserAccountsModel::updatePassword(const QVariant &userUsername, const QVari
 {
     emit logDataChanged("INFO", "Starting updatePassword()");
 
-    QSqlDatabase m_db = QSqlDatabase::database();
-
-    QString oldPassword = "";
-    QString newPassword = hashPassword(passwordNew.toString());
-
-    int index = getUserIndex(userUsername.toString());
-
-    if(index != -1)
-    {
-        if(m_db.isOpen())
-        {
-            QSqlQuery query;
-            query.prepare("SELECT password FROM \"users\" WHERE username=:username");
-            query.bindValue(":username", userUsername.toString());
-
-            if(query.exec())
-            {
-                if(query.size() > 0 && query.first())
-                {
-                    QString p = query.value(0).toString();
-                    QString salt = p.split(":").size() >= 2 ? p.split(":").at(1) : "";
-                    oldPassword = hashPassword(passwordOld.toString(), salt);
-
-                    Logger::logDebug("Password change: Salt generated", salt);
-                    Logger::logDebug("Password change: Old password hash", p);
-
-                    if( p != oldPassword) {
-
-                        emit userPasswordChanged(false);
-
-                        emit userPasswordChangeError("Could not authenticate");
-
-                        return;
-                    }
-                } else {
-                    emit userPasswordChanged(false);
-
-                    emit userPasswordChangeError("Could not authenticate");
-
-                    return;
-                }
-            }
-
-            else
-            {
-                emit userPasswordChanged(false);
-
-                emit userPasswordChangeError("Could not authenticate!");
-
-                return;
-            }
-
-            QSqlQuery query1;
-            query1.prepare("UPDATE \"users\" set password=:password WHERE username=:username");
-            query1.bindValue(":password", newPassword);
-            query1.bindValue(":username", userUsername.toString());
-
-            if(query1.exec())
-            {
-                m_db.commit();
-
-                // qDebug() << ">> User Password Updated";
-
-                setData(this->index(index), QVariant::fromValue(newPassword), UserPasswordRole);
-
-                emit userPasswordChanged(true);
-
-                emit logDataChanged("INFO", "User Password Updated");
-            }
-
-            else
-            {
-                m_db.rollback();
-
-                emit userPasswordChanged(false);
-
-                emit userPasswordChangeError("Failed to update password");
-
-                QString errorStr = "Error executing SQL: " + query.lastError().text();
-
-                // qDebug() << errorStr;
-
-                emit logDataChanged("CRITICAL", errorStr);
-            }
-        }
+    if (!m_backendManager) {
+        emit logDataChanged("ERROR", "BackendManager not available");
+        emit userPasswordChanged(false);
+        return;
     }
 
-    else
-    {
-        // qDebug() << ">> User index could not be found ...";
-
-        emit logDataChanged("CRITICAL", "User index could not be found");
-    }
+    QJsonObject data;
+    data["oldPassword"] = passwordOld.toString();
+    data["newPassword"] = passwordNew.toString();
+    
+    QString endpoint = QString("/api/v1/salamapos/users/%1/password").arg(userUsername.toString());
+    m_pendingEndpoint = endpoint;
+    m_backendManager->putRequest(endpoint, data);
 
     emit logDataChanged("INFO", "Ending updatePassword()");
-
 }
 
 void UserAccountsModel::removeUserAccount(const QVariant &userUsername, QVariant index)
 {
     emit logDataChanged("INFO", "Starting removeUserAccount()");
 
-    QSqlDatabase m_db = QSqlDatabase::database();
-
-    if(m_db.isOpen())
-    {
-        QSqlQuery query;
-        query.prepare("DELETE FROM \"users\" WHERE username=:username");
-        query.bindValue(":username", userUsername.toString());
-
-        if(query.exec())
-        {
-            m_db.commit();
-
-            // qDebug() << ">> New User Deleted";
-
-            emit logDataChanged("INFO", "New User Deleted");
-
-            removeUserAccount(index.toString().toInt());
-
-            emit userRemovedChanged(true);
-
-        }
-
-        else
-        {
-            m_db.rollback();
-
-            emit userRemovedChanged(false);
-
-            auto errStr = "Error executing SQL: " + query.lastError().text();
-
-            // qDebug() << errStr;
-
-            emit logDataChanged("CRITICAL", errStr);
-        }
+    if (!m_backendManager) {
+        emit logDataChanged("ERROR", "BackendManager not available");
+        emit userRemovedChanged(false);
+        return;
     }
+
+    QString endpoint = QString("/api/v1/salamapos/users/%1").arg(userUsername.toString());
+    m_pendingEndpoint = endpoint;
+    m_backendManager->deleteRequest(endpoint);
 
     emit logDataChanged("INFO", "Ending removeUserAccount()");
 }
@@ -535,47 +394,27 @@ void UserAccountsModel::updateUserAccount(const QVariant &userFirstname, const Q
 {
     emit logDataChanged("INFO", "Starting updateUserAccount() -> Account Details");
 
-    if(userUsername != orig_username && getUserIndex(userUsername.toString()) != -1)
+    if (!m_backendManager) {
+        emit logDataChanged("ERROR", "BackendManager not available");
+        emit userUpdatedChanged(false);
+        return;
+    }
+
+    if(userUsername != orig_username && getUserIndex(userUsername.toString()) != -1) {
         emit usernameExistsChanged(true);
+        return;
+    }
 
-    else
-    {
-        QSqlDatabase m_db = QSqlDatabase::database();
-
-        int index_ = getUserIndex(userUsername.toString());
-
-        if(index_ != -1)
-            if(m_db.isOpen())
-            {
-                QSqlQuery query;
-                query.prepare("UPDATE \"users\" SET firstname=:firstname,lastname=:lastname,username=:username,phone_no=:phone_no WHERE username=:orig_username");
-                query.bindValue(":firstname", userFirstname.toString());
-                query.bindValue(":lastname", userLastname.toString());
-                query.bindValue(":username", userUsername.toString());
-                query.bindValue(":phone_no", userPhoneNo.toString());
-                query.bindValue(":orig_username", orig_username.toString());
-
-                if(query.exec())
-                {
-                    m_db.commit();
-
-                    // qDebug() << " [INFO] User Details updated";
-
-                    emit logDataChanged("INFO","User Details updated");
-
-                    setData(this->index(index_), userFirstname, UserFirstnameRole);
-                    setData(this->index(index_), userLastname, UserLastnameRole);
-                    setData(this->index(index_), userUsername, UserUsernameRole);
-                    setData(this->index(index_), userPhoneNo, UserPhoneNoRole);
-
-                    emit userUpdatedChanged(true);
-
-                    if(m_loggedInUser.value("username").toString() == orig_username.toString())
-                    {
-                        m_loggedInUser["firstname"] = data(this->index(index_), UserFirstnameRole).toString();
-                        m_loggedInUser["lastname"] = data(this->index(index_), UserLastnameRole).toString();
-                        m_loggedInUser["username"] = data(this->index(index_), UserUsernameRole).toString();
-                        m_loggedInUser["phone_no"] = data(this->index(index_), UserPhoneNoRole).toString();
+    QJsonObject data;
+    data["firstname"] = userFirstname.toString();
+    data["lastname"] = userLastname.toString();
+    data["username"] = userUsername.toString();
+    data["phone_no"] = userPhoneNo.toString();
+    data["orig_username"] = orig_username.toString();
+    
+    QString endpoint = QString("/api/v1/salamapos/users/%1").arg(userUsername.toString());
+    m_pendingEndpoint = endpoint;
+    m_backendManager->putRequest(endpoint, data);
 
                         emit logged_inUserChanged();
                     }
@@ -610,85 +449,31 @@ void UserAccountsModel::updateUserAccount(const QVariant &userUsername, const bo
 {
     emit logDataChanged("INFO", "Starting updateUserAccount() -> Account Priviledges");
 
-    int index_ = getUserIndex(userUsername.toString());
-
-    if(index_ == -1)
+    if (!m_backendManager) {
+        emit logDataChanged("ERROR", "BackendManager not available");
         emit userPriviledgesChanged(false);
-
-    else
-    {
-        QSqlDatabase m_db = QSqlDatabase::database();
-
-        if(m_db.isOpen())
-        {
-            QSqlQuery query;
-            query.prepare("UPDATE priviledges SET can_add_user=:can_add_user,can_remove_user=:can_remove_user,can_add_product=:can_add_product,can_remove_product=:can_remove_product, can_add_stock=:can_add_stock,can_remove_stock=:can_remove_stock,can_remove_sales=:can_remove_sales,can_backup=:can_backup WHERE username=:username");
-            query.bindValue(":can_add_user", stringifyBool(canAddUsers));
-            query.bindValue(":can_remove_user", stringifyBool(canRemoveUsers));
-            query.bindValue(":can_add_product", stringifyBool(canAddItems));
-            query.bindValue(":can_remove_product", stringifyBool(canRemoveItems));
-            query.bindValue(":can_add_stock", stringifyBool(canAddStock));
-            query.bindValue(":can_remove_stock", stringifyBool(canRemoveStock));
-            query.bindValue(":can_remove_sales", stringifyBool(canUndoSales));
-            query.bindValue(":can_backup", stringifyBool(canBackupDb));
-            query.bindValue(":username", userUsername.toString());
-
-            if(query.exec())
-            {
-                m_db.commit();
-
-                // qDebug() << " [Info] User Priviledges updated";
-
-                emit logDataChanged("INFO", "User Priviledges updated");
-
-                setData(this->index(index_), canAddUsers, CanAddUsersRole);
-                setData(this->index(index_), canRemoveUsers, CanRemoveUsersRole);
-                setData(this->index(index_), canAddItems, CanAddItemsRole);
-                setData(this->index(index_), canRemoveItems, CanRemoveItemsRole);
-                setData(this->index(index_), canAddStock, CanAddStockRole);
-                setData(this->index(index_), canRemoveStock, CanRemoveStockRole);
-                setData(this->index(index_), canUndoSales, CanUndoSalesRole);
-                setData(this->index(index_), canBackupDb, CanBackupDbRole);
-
-                QString str = getUserRoleAsAString(canAddUsers, canRemoveUsers, canAddItems, canRemoveItems, canAddStock, canRemoveStock, canUndoSales, canBackupDb);
-                setData(this->index(index_), str, RolesStringRole);
-
-                emit userPriviledgesChanged(true);
-
-                if(m_loggedInUser.value("username").toString() == userUsername.toString())
-                {
-                    QJsonDocument doc(m_loggedInUser);
-                    QJsonObject docObj = doc.object();
-
-                    docObj["canAddUser"] = data(this->index(index_), CanAddUsersRole).toBool();
-                    docObj["canRemoveUsers"] = data(this->index(index_), CanRemoveUsersRole).toBool();
-                    docObj["canAddItems"] = data(this->index(index_), CanAddItemsRole).toBool();
-                    docObj["canRemoveItems"] = data(this->index(index_), CanRemoveItemsRole).toBool();
-                    docObj["canAddStock"] = data(this->index(index_), CanAddStockRole).toBool();
-                    docObj["canRemoveStock"] = data(this->index(index_), CanRemoveStockRole).toBool();
-                    docObj["canUndoSales"] = data(this->index(index_), CanUndoSalesRole).toBool();
-                    docObj["canBackupDb"] = data(this->index(index_), CanBackupDbRole).toBool();
-
-                    setLoggedInUser(docObj);
-
-                    emit logged_inUserChanged();
-                }
-            }
-
-            else
-            {
-                m_db.rollback();
-
-                emit userPriviledgesChanged(false);
-
-                auto errStr = "Error executing SQL: " + query.lastError().text() + " :: " + query.executedQuery();
-
-                // qDebug() << errStr;
-
-                emit logDataChanged("CRITICAL", errStr);
-            }
-        }
+        return;
     }
+
+    int index_ = getUserIndex(userUsername.toString());
+    if(index_ == -1) {
+        emit userPriviledgesChanged(false);
+        return;
+    }
+
+    QJsonObject data;
+    data["canAddUser"] = canAddUsers;
+    data["canRemoveUsers"] = canRemoveUsers;
+    data["canAddItems"] = canAddItems;
+    data["canRemoveItems"] = canRemoveItems;
+    data["canAddStock"] = canAddStock;
+    data["canRemoveStock"] = canRemoveStock;
+    data["canUndoSales"] = canUndoSales;
+    data["canBackupDb"] = canBackupDb;
+    
+    QString endpoint = QString("/api/v1/salamapos/users/%1/privileges").arg(userUsername.toString());
+    m_pendingEndpoint = endpoint;
+    m_backendManager->putRequest(endpoint, data);
 
     emit logDataChanged("INFO", "Ending updateUserAccount() -> Account Priviledges");
 }
@@ -697,53 +482,22 @@ void UserAccountsModel::markAccountForDeleting(const QVariant &userUsername)
 {
     emit logDataChanged("INFO", "Starting markAccountForDeleting()");
 
-    QSqlDatabase m_db = QSqlDatabase::database();
+    if (!m_backendManager) {
+        emit logDataChanged("ERROR", "BackendManager not available");
+        emit toDeleteAccountChanged(false);
+        return;
+    }
 
     int index = getUserIndex(userUsername.toString());
-
-    if(index != -1)
-    {
-        if(m_db.isOpen())
-        {
-            QSqlQuery query;
-            query.prepare("UPDATE \"users\" set to_delete_account=:to_delete_account WHERE username=:username");
-            query.bindValue(":to_delete_account", true);
-            query.bindValue(":username", userUsername.toString());
-
-            if(query.exec())
-            {
-                m_db.commit();
-
-                // qDebug() << ">> To delete Account Updated";
-
-                removeUserAccount(index);
-
-                emit toDeleteAccountChanged(true);
-
-                emit logDataChanged("INFO", "To delete Account Updated");
-            }
-
-            else
-            {
-                m_db.rollback();
-
-                emit toDeleteAccountChanged(false);
-
-                auto errStr = "Error executing SQL: " + query.lastError().text();
-
-                // qDebug() << errStr;
-
-                emit logDataChanged("CRITICAL", errStr);
-            }
-        }
-    }
-
-    else
-    {
-        // qDebug() << ">> User index could not be found ...";
-
+    if(index == -1) {
         emit logDataChanged("WARNING", "User index could not be found");
+        emit toDeleteAccountChanged(false);
+        return;
     }
+
+    QString endpoint = QString("/api/v1/salamapos/users/%1/mark-delete").arg(userUsername.toString());
+    m_pendingEndpoint = endpoint;
+    m_backendManager->putRequest(endpoint, QJsonObject());
 
     emit logDataChanged("INFO", "Ending markAccountForDeleting()");
 }
@@ -752,99 +506,161 @@ void UserAccountsModel::loadAllUserAccounts()
 {
     emit logDataChanged("INFO", "Starting loadAllUserAccounts()");
 
-    QSqlDatabase m_db = QSqlDatabase::database();
-
-    if(m_db.isOpen())
-    {
-        QSqlQuery query;
-
-        const QString sql = "SELECT firstname,lastname,users.username,password,phone_no,date_added, can_add_user, can_remove_user, can_add_product,\
-            can_remove_product, can_add_stock, can_remove_stock, can_remove_sales, can_backup, to_change_password FROM \"users\" INNER \
-            JOIN \"priviledges\" ON users.username = priviledges.username";
-
-
-        if(query.exec(sql))
-        {
-            while(query.next())
-            {
-                QString userFirstName = query.value(0).toString();
-                QString userLastname = query.value(1).toString();
-                QString userUsername = query.value(2).toString();
-                QString password = query.value(3).toString();
-                QString userPhoneNo = query.value(4).toString();
-                QString userDateAdded = query.value(5).toString();
-                bool canAddUsers = query.value(6).toBool();
-                bool canRemoveUsers = query.value(7).toBool();
-                bool canAddItems = query.value(8).toBool();
-                bool canRemoveItems = query.value(9).toBool();
-                bool canAddStock = query.value(10).toBool();
-                bool canRemoveStock = query.value(11).toBool();
-                bool canUndoSales = query.value(12).toBool();
-                bool canBackupDb = query.value(13).toBool();
-                bool changePassword = query.value(14).toBool();
-
-                QString role = getUserRoleAsAString(canAddUsers, canRemoveUsers, canAddItems, canRemoveItems, canAddStock, canRemoveStock, canUndoSales, canBackupDb);
-
-                addNewUserAccount(new UserAccounts(userFirstName, userLastname, userUsername, userPhoneNo, password, userDateAdded, canAddUsers, canRemoveUsers, canAddItems, canRemoveItems, canAddStock, canRemoveStock, canUndoSales, canBackupDb,changePassword, role));
-
-            }
-            emit userAccountsLoaded(true);
-
-        }
-
-        else
-        {
-            emit userAccountsLoaded(false);
-
-            auto errStr = "Error executing SQL: " + query.lastError().text();
-
-            // qDebug() << errStr;
-
-            emit logDataChanged("CRITICAL", errStr);
-        }
+    if (!m_backendManager) {
+        emit logDataChanged("ERROR", "BackendManager not available");
+        emit userAccountsLoaded(false);
+        return;
     }
 
-    emit logDataChanged("INFO", "Ending loadAllUserAccounts()");
+    m_pendingEndpoint = "/api/v1/salamapos/users";
+    m_backendManager->getRequest(m_pendingEndpoint);
+}
+
+void UserAccountsModel::onApiResponse(const QString &endpoint, const QJsonObject &response)
+{
+    if (endpoint == "/api/v1/salamapos/users" && m_pendingEndpoint == endpoint) {
+        // GET request - load all users
+        if (response.value("success").toBool()) {
+            QJsonArray users = response.value("users").toArray();
+            
+            beginResetModel();
+            mUserAccounts.clear();
+            
+            for (const QJsonValue &value : users) {
+                QJsonObject user = value.toObject();
+                QString firstname = user.value("firstname").toString();
+                QString lastname = user.value("lastname").toString();
+                QString username = user.value("username").toString();
+                QString password = user.value("password").toString();
+                QString phone_no = user.value("phone_no").toString();
+                QString date_added = user.value("date_added").toString();
+                bool canAddUsers = user.value("canAddUser").toBool();
+                bool canRemoveUsers = user.value("canRemoveUsers").toBool();
+                bool canAddItems = user.value("canAddItems").toBool();
+                bool canRemoveItems = user.value("canRemoveItems").toBool();
+                bool canAddStock = user.value("canAddStock").toBool();
+                bool canRemoveStock = user.value("canRemoveStock").toBool();
+                bool canUndoSales = user.value("canUndoSales").toBool();
+                bool canBackupDb = user.value("canBackupDb").toBool();
+                bool changePassword = user.value("changePassword").toBool();
+                
+                QString role = getUserRoleAsAString(canAddUsers, canRemoveUsers, canAddItems, 
+                    canRemoveItems, canAddStock, canRemoveStock, canUndoSales, canBackupDb);
+                
+                addNewUserAccount(new UserAccounts(firstname, lastname, username, phone_no, 
+                    password, date_added, canAddUsers, canRemoveUsers, canAddItems, 
+                    canRemoveItems, canAddStock, canRemoveStock, canUndoSales, 
+                    canBackupDb, changePassword, role));
+            }
+            
+            endResetModel();
+            emit userAccountsLoaded(true);
+            emit logDataChanged("INFO", "Users loaded successfully");
+        } else {
+            emit userAccountsLoaded(false);
+            emit logDataChanged("ERROR", response.value("error").toString());
+        }
+    } else if (m_pendingEndpoint == "/api/v1/salamapos/users") {
+        // POST request - create user
+        if (response.value("success").toBool()) {
+            emit userAddedChanged(true);
+            emit logDataChanged("INFO", "User added successfully");
+            loadAllUserAccounts(); // Reload list
+        } else {
+            if (response.value("error").toString().contains("already exists")) {
+                emit usernameExistsChanged(true);
+            }
+            emit userAddedChanged(false);
+            emit logDataChanged("ERROR", response.value("error").toString());
+        }
+    } else if (m_pendingEndpoint.contains("/password")) {
+        // Password update
+        if (response.value("success").toBool()) {
+            emit userPasswordChanged(true);
+            emit logDataChanged("INFO", "Password updated successfully");
+        } else {
+            emit userPasswordChanged(false);
+            emit userPasswordChangeError(response.value("error").toString());
+        }
+    } else if (m_pendingEndpoint.contains("/privileges")) {
+        // Privileges update
+        if (response.value("success").toBool()) {
+            emit userPriviledgesChanged(true);
+            emit logDataChanged("INFO", "Privileges updated successfully");
+            loadAllUserAccounts(); // Reload to get updated data
+        } else {
+            emit userPriviledgesChanged(false);
+            emit logDataChanged("ERROR", response.value("error").toString());
+        }
+    } else if (m_pendingEndpoint.contains("/mark-delete")) {
+        // Mark for deletion
+        if (response.value("success").toBool()) {
+            emit toDeleteAccountChanged(true);
+            emit logDataChanged("INFO", "Account marked for deletion");
+            loadAllUserAccounts(); // Reload list
+        } else {
+            emit toDeleteAccountChanged(false);
+            emit logDataChanged("ERROR", response.value("error").toString());
+        }
+    } else if (m_pendingEndpoint.contains("/users/") && !m_pendingEndpoint.contains("/password") && !m_pendingEndpoint.contains("/privileges")) {
+        // User update or delete
+        if (response.value("success").toBool()) {
+            if (m_pendingEndpoint.contains("DELETE") || response.value("message").toString().contains("deleted")) {
+                emit userRemovedChanged(true);
+                emit logDataChanged("INFO", "User removed successfully");
+                loadAllUserAccounts(); // Reload list
+            } else {
+                emit userUpdatedChanged(true);
+                emit logDataChanged("INFO", "User updated successfully");
+                loadAllUserAccounts(); // Reload list
+            }
+        } else {
+            emit userUpdatedChanged(false);
+            emit userRemovedChanged(false);
+            emit logDataChanged("ERROR", response.value("error").toString());
+        }
+    }
+}
+
+void UserAccountsModel::onApiError(const QString &error)
+{
+    emit logDataChanged("ERROR", error);
+    if (m_pendingEndpoint == "/api/v1/salamapos/users") {
+        emit userAccountsLoaded(false);
+    }
+}
+
+void UserAccountsModel::onLoginResponse(const QJsonObject &response)
+{
+    if (response.value("success").toBool()) {
+        QJsonObject user = response.value("user").toObject();
+        setLoggedInUser(user);
+        emit logged_inUserChanged();
+        emit loggingInUsernameStatus(true);
+        emit loggingInPasswordStatus(true);
+        emit logDataChanged("INFO", "Login successful");
+    } else {
+        emit loggingInUsernameStatus(false);
+        emit loggingInPasswordStatus(false);
+        emit logDataChanged("ERROR", response.value("error").toString());
+    }
 }
 
 void UserAccountsModel::loginUser(const QVariant &uname, const QVariant &pswd)
 {
     emit logDataChanged("INFO", "Starting loginUser()");
 
-    const int ind = getUserIndex(uname.toString());
-
-    if(ind == -1)
-    {
+    if (!m_backendManager) {
+        emit logDataChanged("ERROR", "BackendManager not available");
         emit loggingInUsernameStatus(false);
-
-        emit logDataChanged("INFO", "User not in the database");
-        // qDebug() << ">> User not in the database";
+        emit loggingInPasswordStatus(false);
+        return;
     }
 
-    else
-    {
-        emit loggingInUsernameStatus(true);
-
-        QString savedP = data(this->index(ind), UserPasswordRole).toString();
-
-        if(login(savedP, pswd.toString()))
-        {
-            // qDebug() << " [DEBUG] Password correct!";
-
-            emit loggingInPasswordStatus(true);
-
-            QJsonDocument doc(m_loggedInUser);
-            QJsonObject docObj = doc.object();
-
-            docObj["firstname"] = data(this->index(ind), UserFirstnameRole).toString();
-            docObj["lastname"] = data(this->index(ind), UserLastnameRole).toString();
-            docObj["username"] = data(this->index(ind), UserUsernameRole).toString();
-            docObj["phone_no"] = data(this->index(ind), UserPhoneNoRole).toString();
-            docObj["canAddUser"] = data(this->index(ind), CanAddUsersRole).toBool();
-            docObj["canRemoveUsers"] = data(this->index(ind), CanRemoveUsersRole).toBool();
-            docObj["canAddItems"] = data(this->index(ind), CanAddItemsRole).toBool();
-            docObj["canRemoveItems"] = data(this->index(ind), CanRemoveItemsRole).toBool();
-            docObj["canAddStock"] = data(this->index(ind), CanAddStockRole).toBool();
+    m_backendManager->login(uname.toString(), pswd.toString());
+    
+    // Response will be handled in onLoginResponse slot
+}
             docObj["canRemoveStock"] = data(this->index(ind), CanRemoveStockRole).toBool();
             docObj["canUndoSales"] = data(this->index(ind), CanUndoSalesRole).toBool();
             docObj["canBackupDb"] = data(this->index(ind), CanBackupDbRole).toBool();
