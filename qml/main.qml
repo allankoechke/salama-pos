@@ -64,6 +64,23 @@ Window {
     property alias backup: backup
     property alias logic: logic
 
+    // Helper function to map old log levels to new logger
+    function logMessage(level, message) {
+        if(level === "INFO") {
+            logger.info(message)
+        } else if(level === "DEBUG") {
+            logger.debug(message)
+        } else if(level === "WARNING") {
+            logger.warning(message)
+        } else if(level === "ERROR") {
+            logger.error(message)
+        } else if(level === "CRITICAL") {
+            logger.critical(message)
+        } else {
+            logger.info(message)
+        }
+    }
+
     Component.onCompleted: {
         popupTimer.start();
         timer1.start();
@@ -131,7 +148,7 @@ Window {
         function onIsInternetConnectedChanged(state)
         {
             console.log(state? "Internet is UP":"Internet is DOWN")
-            QmlInterface.logToFile("INFO", state? "Connected to Internet":"Disconnected from the Internet")
+            logger.info(state? "Connected to Internet":"Disconnected from the Internet")
         }
 
         function onDatabaseLoadedChanged(state)
@@ -169,7 +186,7 @@ Window {
 
         function onLogDataChanged(level, info)
         {
-            QmlInterface.logToFile(level, info)
+            logMessage(level, info)
         }
 
         function onUserAccountsLoaded(status)
@@ -206,7 +223,7 @@ Window {
 
             isAdmin = loggedUser_canAddAccounts && loggedUser_canDeleteAccounts && loggedUser_canAddItems && loggedUser_canDeleteItems && loggedUser_canAddStock && loggedUser_canDeleteStock && loggedUser_canUndoSales && loggedUser_canBackupDb
 
-            QmlInterface.logToFile("INFO", "Logged In User: username="+loggedUser_username)
+            logger.info("User logged in", "Username: " + loggedUser_username)
         }
     }
 
@@ -216,7 +233,7 @@ Window {
 
         function onLogDataChanged(level, info)
         {
-            QmlInterface.logToFile(level, info)
+            logMessage(level, info)
         }
     }
 
@@ -226,7 +243,7 @@ Window {
 
         function onLogDataChanged(level, info)
         {
-            QmlInterface.logToFile(level, info)
+            logMessage(level, info)
         }
     }
 
@@ -236,7 +253,7 @@ Window {
 
         function onLogDataChanged(level, info)
         {
-            QmlInterface.logToFile(level, info)
+            logMessage(level, info)
         }
     }
 
@@ -246,7 +263,7 @@ Window {
 
         function onLogDataChanged(level, info)
         {
-            QmlInterface.logToFile(level, info)
+            logMessage(level, info)
         }
     }
 
@@ -256,7 +273,7 @@ Window {
 
         function onLogDataChanged(level, info)
         {
-            QmlInterface.logToFile(level, info)
+            logMessage(level, info)
         }
     }
 }

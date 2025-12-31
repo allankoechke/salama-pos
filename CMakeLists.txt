@@ -48,6 +48,7 @@ qt_add_executable(salamapos
     cpp/main.cpp
     cpp/databaseinterface.cpp
     cpp/datetime.cpp
+    cpp/logger.cpp
     cpp/pingserverprocess.cpp
     cpp/processinterface.cpp
     cpp/qmlinterface.cpp

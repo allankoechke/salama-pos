@@ -19,6 +19,7 @@
 
 #include "version.h"
 #include "qmlinterface.h"
+#include "logger.h"
 #include "models/stockitemsmodel.h"
 #include "models/checkoutitemsmodel.h"
 #include "models/useraccountsmodel.h"
@@ -87,6 +88,10 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("AppVersionMinor", SALAMA_POS_VERSION_MINOR);
     engine.rootContext()->setContextProperty("AppVersionPatch", SALAMA_POS_VERSION_PATCH);
     engine.rootContext()->setContextProperty("AppVersionNickname", SALAMA_POS_VERSION_NICKNAME);
+    
+    // Expose logger to QML
+    Logger logger;
+    engine.rootContext()->setContextProperty("logger", &logger);
 
     UserAccountsModel m_userAccounts;
 

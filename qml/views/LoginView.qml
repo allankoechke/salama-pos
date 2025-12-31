@@ -192,7 +192,7 @@ Item {
 
                 else
                 {
-                    console.log(" [INFO] Correct Password")
+                    logger.info("User login successful", "Username: " + _uname.text)
                     
                     // Access parent MainAppView through Loader
                     var loader = root.parent
