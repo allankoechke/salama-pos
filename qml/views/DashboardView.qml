@@ -201,14 +201,9 @@ Item {
                             {
                                 anchors.fill: parent
                                 onClicked: {
-                                    logger.debug("Open the SalesSummaryDialog()")
-                                    QmlInterface.logToFile("INFO", "Open the SalesSummaryDialog()")
+                                    logger.info("Opening sales summary dialog")
                                     salesSummaryDialog.show();
-                                    logger.debug("Load Sales for SalesSummaryDialog()")
-                                    QmlInterface.logToFile("INFO", "Load Sales for SalesSummaryDialog()")
                                     salesSummaryDialog.call_getSalesSummary()
-                                    logger.debug("Finished Opening SalesSummaryDialog()")
-                                    QmlInterface.logToFile("INFO", "Finished Opening SalesSummaryDialog()")
                                 }
                             }
                         }
@@ -609,7 +604,7 @@ Item {
                                     label: qsTr("Search item")
 
                                     onClicked: {
-                                        QmlInterface.logToFile("INFO", "QML => DashboardView::SearchItem ...")
+                                        logger.debug("Search item clicked")
                                     }
                                 }
 
@@ -623,15 +618,12 @@ Item {
                                         if(loggedUser_canAddAccounts)
                                         {
                                             userAccountPopup.open()
-
-                                            QmlInterface.logToFile("INFO", "QML => DashboardView::AddNewUser User has rights to add users")
+                                            logger.info("Add new user clicked")
                                         }
-
                                         else
                                         {
                                             ToastModel.addToastItem("error", "User has no rights to add users")
-
-                                            QmlInterface.logToFile("INFO", "QML => DashboardView::AddNewUser User has no rights to add users")
+                                            logger.warning("Add new user: insufficient permissions")
                                         }
                                     }
                                 }
@@ -645,7 +637,7 @@ Item {
                                     onClicked: {
                                         navBarIndex = 2; // Switch to item stock window
                                         stackStockView.currentScreen = 1;
-                                        QmlInterface.logToFile("INFO", "QML => DashboardView::AddStock Switching to Stock Window")
+                                        logger.info("Switching to stock window")
                                     }
                                 }
 
@@ -657,7 +649,7 @@ Item {
 
                                     onClicked: {
                                         navBarIndex = 4;
-                                        QmlInterface.logToFile("INFO", "QML => DashboardView::SendMessage Clicked")
+                                        logger.info("Send message clicked")
                                     }
                                 }
 
@@ -678,7 +670,7 @@ Item {
 
                                     onClicked: {
                                         // TODO
-                                        QmlInterface.logToFile("INFO", "QML => DashboardView::SyncToOnlineAccount clicked")
+                                        logger.info("Sync to online account clicked")
 
                                     }
                                 }

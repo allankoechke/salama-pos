@@ -236,7 +236,7 @@ Rectangle {
         text: qsTr("Start the update? Changes will appear after the app is restarted.")
         onAccepted: {
             logger.debug("Starting update ...")
-            QmlInterface.logToFile("INFO", "QML => MainAppView::getUpdate Starting Update")
+            logger.info("Starting update check")
             QmlInterface.installUpdate();
             messageBoxUpdate.close();
         }

@@ -11,11 +11,7 @@ QmlInterface::QmlInterface(QObject *parent) : QObject(parent)
     setDatabaseConnectionErrorString("No connection made yet!");
     setIsInternetConnected(false);
 
-    // Ensure logs directory has been created
-    QString logsPath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-    d.mkpath(logsPath+"/SalamaPOS/logs");
-    m_logsPath = logsPath+"/SalamaPOS/logs";
-    logToFile("INFO", "\n\n----------------------------------------\nStarting SalamaPOS Application\n----------------------------------------\n\n");
+    Logger::logInfo("Starting SalamaPOS Application");
 
     // Set App Company Details
     qApp->setOrganizationName("codeart");
@@ -49,13 +45,12 @@ QmlInterface::QmlInterface(QObject *parent) : QObject(parent)
     {
         Logger::logInfo("Database connection successful");
         emitDatabaseState(true, "");
-        logToFile("INFO", "DatabaseInterface::initializeDatabase() => Database Connection Successful");
         setTabularData();
     }
     else
     {
         QString errorMsg = m_databaseInterface->getLastError();
-        logToFile("FATAL", "DatabaseInterface::initializeDatabase() => Could not create a database Connection ==> " + errorMsg);
+        Logger::logFatal("Database connection failed", errorMsg);
         emitDatabaseState(false, errorMsg);
         // Error dialog will be shown via connectionError signal
     }
@@ -71,19 +66,13 @@ QmlInterface::QmlInterface(QObject *parent) : QObject(parent)
 
 QmlInterface::~QmlInterface()
 {
-    logToFile("INFO", "\n\n----------------------------------------\nEnding SalamaPOS Application Session\n----------------------------------------\n\n");
+    Logger::logInfo("Ending SalamaPOS Application Session\n\n");
 
     m_databaseInterface->deleteLater();
     m_dateTime->deleteLater();
     webInt->deleteLater();
     m_settings->deleteLater();
     m_WebInterface->deleteLater();
-    // logsTimer->deleteLater();
-
-    if(logWriter.is_open())
-        logWriter.close();
-
-    Logger::logInfo("QmlInterface destructor called");
 }
 
 void QmlInterface::emitDatabaseState(const bool &state, const QString &status)
@@ -97,10 +86,6 @@ void QmlInterface::emitDatabaseState(const bool &state, const QString &status)
     setDatabaseConnectionErrorString(status);
 }
 
-std::string QmlInterface::logFileName() const
-{
-    return m_logFileName;
-}
 
 bool QmlInterface::databaseLoaded() const
 {
@@ -145,7 +130,7 @@ QJsonObject QmlInterface::getScreenSize()
 
 void QmlInterface::fetchSavedSettings()
 {
-    logToFile("INFO", "Starting QmlInterface::fetchSavedSettings()");
+    Logger::logDebug("Fetching saved settings");
 
     setIsDarkTheme(m_settings->value("Theme/isDarkTheme", true).toBool());
     setTablesCreated(m_settings->value("Config/isTablesCreated", false).toBool());
@@ -153,12 +138,12 @@ void QmlInterface::fetchSavedSettings()
     setProductTypeAdded(m_settings->value("Config/isProductTypeAdded", false).toBool());
     setProductStockAdded(m_settings->value("Config/isProductStockAdded", false).toBool());
 
-    logToFile("INFO", "Ending QmlInterface::fetchSavedSettings()");
+    Logger::logDebug("Finished fetching saved settings");
 }
 
 void QmlInterface::getSalesStatisticsForDashboard()
 {
-    logToFile("INFO", "Starting QmlInterface::getSalesStatisticsForDashboard()");
+    Logger::logDebug("Fetching sales statistics");
 
     // Get the sales quantities and cost for the day!
     QSqlDatabase db = QSqlDatabase::database();
@@ -193,17 +178,17 @@ void QmlInterface::getSalesStatisticsForDashboard()
 
         else
         {
-            logToFile("CRITICAL", "Error fetchin data from the database: [" + query.executedQuery() + "] -> " + query.lastError().text());
+            Logger::logCritical("Error fetching sales statistics", query.lastError().text());
         }
     }
 
 
-    logToFile("INFO", "Ending QmlInterface::getSalesStatisticsForDashboard()");
+    Logger::logDebug("Finished fetching sales statistics");
 }
 
 void QmlInterface::getMessagesStatisticsForDashboard(const QString &uname)
 {
-    logToFile("INFO", "Starting QmlInterface::getMessagesStatisticsForDashboard()");
+    Logger::logDebug("Fetching messages statistics");
 
     // Get messages (sent, received, pending) for the current logged user
     QSqlDatabase db = QSqlDatabase::database();
@@ -266,17 +251,17 @@ void QmlInterface::getMessagesStatisticsForDashboard(const QString &uname)
 
             else
             {
-                logToFile("CRITICAL", "Error fetching data from the database: [" + query.executedQuery() + "] -> " + query.lastError().text());
+                Logger::logCritical("Error fetching messages statistics", query.lastError().text());
             }
         }
     }
 
-    logToFile("INFO", "Ending QmlInterface::getMessagesStatisticsForDashboard()");
+    Logger::logDebug("Finished fetching messages statistics");
 }
 
 void QmlInterface::getRemindersStatisticsForDashboard()
 {
-    logToFile("INFO", "Starting QmlInterface::getRemindersStatisticsForDashboard()");
+    Logger::logDebug("Fetching reminders statistics");
 
     // Get reminder & notification numbers for the current logged in user
     QSqlDatabase db = QSqlDatabase::database();
@@ -327,22 +312,22 @@ void QmlInterface::getRemindersStatisticsForDashboard()
 
             else
             {
-                logToFile("CRITICAL", "Error fetchin data from the database: [" + query.executedQuery() + "] -> " + query.lastError().text());
+                Logger::logCritical("Error fetching sales statistics", query.lastError().text());
             }
         }
 
         else
         {
-            logToFile("CRITICAL", "Error fetchin data from the database: [" + query.executedQuery() + "] -> " + query.lastError().text());
+            Logger::logCritical("Error fetching sales statistics", query.lastError().text());
         }
     }
 
-    logToFile("INFO", "Ending QmlInterface::getRemindersStatisticsForDashboard()");
+    Logger::logDebug("Finished fetching reminders statistics");
 }
 
 void QmlInterface::getDashboardTableData()
 {
-    logToFile("INFO", "Starting QmlInterface::getDashboardTableData()");
+    Logger::logDebug("Fetching dashboard table data");
 
     QDateTime dt = QDateTime::currentDateTime();
     QStringList plot;
@@ -413,11 +398,11 @@ void QmlInterface::getDashboardTableData()
                     }
 
                 } else {
-                    logToFile("CRITICAL", "QmlInterface::getDashboardTableData() => Couldn't load re-payment_history data from db :" + query.lastError().text());
+                    Logger::logCritical("Couldn't load repayment history data", query.lastError().text());
                 }
 
             } else {
-                logToFile("CRITICAL", "QmlInterface::getDashboardTableData() => Couldn't load payment data from db :" + query.lastError().text());
+                Logger::logCritical("Couldn't load payment data", query.lastError().text());
             }
 
             m_plotXAxis.clear();
@@ -474,7 +459,7 @@ void QmlInterface::getDashboardTableData()
 
     getSalesStatisticsForDashboard();
 
-    logToFile("INFO", "Ending QmlInterface::getDashboardTableData()");
+    Logger::logDebug("Finished fetching dashboard table data");
 }
 
 void QmlInterface::onNewVersionAvailable(const QJsonObject &json)
@@ -485,21 +470,21 @@ void QmlInterface::onNewVersionAvailable(const QJsonObject &json)
     // Validate the filename
     if(m_UpdateJSON.value("filename").toString().isEmpty())
     {
-        logToFile("CRITICAL", "QmlInterface::onNewVersionAvailable() => Filename is empty!");
+        Logger::logCritical("Update filename is empty");
         return;
     }
 
     // Validate the path
     if(m_path.isEmpty())
     {
-        logToFile("CRITICAL", "QmlInterface::onNewVersionAvailable() => Path is empty!");
+        Logger::logCritical("Update path is empty");
         return;
     }
 
     // Validate filename is valid, does not end up leaving the base directory
     if(m_UpdateJSON.value("filename").toString().contains(".."))
     {
-        logToFile("CRITICAL", "QmlInterface::onNewVersionAvailable() => Filename is invalid!");
+        Logger::logCritical("Update filename is invalid");
         return;
     }
 
@@ -518,15 +503,6 @@ void QmlInterface::onNewVersionAvailable(const QJsonObject &json)
     }
 }
 
-void QmlInterface::setLogFileName(std::string logFileName)
-{
-    if (m_logFileName == logFileName)
-        return;
-
-    m_logFileDayChanged = true;
-    m_logFileName = logFileName;
-    emit logFileNameChanged(m_logFileName);
-}
 
 void QmlInterface::setDatabaseLoaded(bool databaseLoaded)
 {
@@ -564,16 +540,6 @@ void QmlInterface::setCreditPaidYAxis(QList<int> creditPaidYAxis)
     emit creditPaidYAxisChanged(m_creditPaidYAxis);
 }
 
-void QmlInterface::onLogsTimerTimeout()
-{
-    QString logName = QDateTime::currentDateTime().toString("yyyy-MM-dd")+"_app.log";
-
-    QString path = m_logsPath + "/" + logName;
-
-    setLogFileName(path.toStdString());
-
-    Logger::logDebug("Log file name", path);
-}
 
 void QmlInterface::onInternetConnectionStatusChanged(bool state)
 {
@@ -583,7 +549,7 @@ void QmlInterface::onInternetConnectionStatusChanged(bool state)
 
 void QmlInterface::onDatabaseConnectionError(const QString &errorMessage)
 {
-    logToFile("ERROR", "Database connection error dialog shown: " + errorMessage);
+    Logger::logError("Database connection error dialog shown", errorMessage);
     
     QMessageBox msgBox;
     msgBox.setIcon(QMessageBox::Icon::Critical);
@@ -598,24 +564,6 @@ void QmlInterface::onDatabaseConnectionError(const QString &errorMessage)
     msgBox.exec();
 }
 
-void QmlInterface::initializeLogFileName()
-{
-    if(logWriter.is_open())
-    {
-        logWriter.close();
-    }
-
-    QString logName = QDateTime::currentDateTime().toString("yyyy-MM-dd")+"_app.log";
-
-    logWriter.open((m_logsPath+"/"+logName).toStdString(), std::ios::out | std::ios::app | std::ios::binary | std::ios::ate);
-
-    if(logWriter.is_open())
-    {
-        logWriter << "File opened!";
-
-        m_logFileDayChanged = false;
-    }
-}
 
 void QmlInterface::downloadUpdate()
 {
@@ -683,7 +631,7 @@ void QmlInterface::installUpdate()
 
 void QmlInterface::getSalesSummary(const int &ind)
 {
-    logToFile("INFO", "Starting QmlInterface::getSalesSummary()");
+    Logger::logDebug("Fetching sales summary");
 
     QSqlDatabase db = QSqlDatabase::database();
 
@@ -770,21 +718,21 @@ void QmlInterface::getSalesSummary(const int &ind)
 
             emit salesSummaryCost(cash,mpesa,cheque,credit,paid,totals);
 
-            logToFile("INFO","Sales Summary loading successful!");
+            Logger::logInfo("Sales summary loaded successfully");
         }
 
         else
         {
-            logToFile("CRITICAL", "Error Fetching Sales Summary : " + query.lastError().text() + " --- " + query1.lastError().text());
+            Logger::logCritical("Error fetching sales summary", query.lastError().text() + " / " + query1.lastError().text());
         }
     }
 
-    logToFile("INFO", "Ending QmlInterface::getSalesSummary()");
+    Logger::logDebug("Finished fetching sales summary");
 }
 
 void QmlInterface::setTabularData()
 {
-    logToFile("INFO", "Starting QmlInterface::setTabularData()");
+    Logger::logDebug("Setting tabular data");
 
     QFile file(":/sql/type.sql");
     file.open(QIODevice::ReadOnly);
@@ -831,7 +779,7 @@ void QmlInterface::setTabularData()
     }
 
 
-    logToFile("INFO", "Ending QmlInterface::setTabularData()");
+    Logger::logDebug("Finished setting tabular data");
 }
 
 bool QmlInterface::isDarkTheme() const
@@ -1131,39 +1079,6 @@ void QmlInterface::setVersionInt(int versionInt)
     emit versionIntChanged(m_versionInt);
 }
 
-void QmlInterface::logToFile(const QString &level, const QString &log)
-{
-    // Delegate to Logger for consistent formatting
-    if(level == "INFO")
-    {
-        Logger::logInfo(log);
-    }
-    else if(level == "DEBUG")
-    {
-        Logger::logDebug(log);
-    }
-    else if(level == "WARNING")
-    {
-        Logger::logWarning(log);
-    }
-    else if(level == "ERROR")
-    {
-        Logger::logError(log);
-    }
-    else if(level == "CRITICAL")
-    {
-        Logger::logCritical(log);
-    }
-    else if(level == "FATAL")
-    {
-        Logger::logFatal(log);
-    }
-    else
-    {
-        // Default to info for unknown levels
-        Logger::logInfo(log);
-    }
-}
 
 void QmlInterface::openLocation(const QString &path)
 {

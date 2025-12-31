@@ -118,7 +118,7 @@ Item {
 
         function onIsDarkThemeChanged()
         {
-            QmlInterface.logToFile("INFO", "QML => DashboardView::ChangeThemeColor IsDarkTheme?"+QmlInterface.isDarkTheme? "From Light Theme -> Dark Theme":"From Dark Theme -> Light Theme")
+            logger.info("Theme changed", QmlInterface.isDarkTheme ? "Switched to dark theme" : "Switched to light theme")
         }
     }
 

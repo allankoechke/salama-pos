@@ -30,12 +30,12 @@ Window {
     Component.onCompleted: {
         cb.currentIndex = 0;
         logger.debug("Finished loading sales summary")
-        QmlInterface.logToFile("INFO", "QML => Finished loading sales summary")
+        logger.info("Sales summary loaded")
     }
 
     function call_getSalesSummary()
     {
-        QmlInterface.logToFile("INFO", "QML => SalesSummaryDialog.qml: ComboBox::currentIndex="+cb.currentIndex)
+        logger.debug("Sales summary combo box changed", "Index: " + cb.currentIndex)
         QmlInterface.getSalesSummary(cb.currentIndex)
 
     }

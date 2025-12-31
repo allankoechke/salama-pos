@@ -11,7 +11,6 @@
 #include <QScreen>
 #include <QFile>
 #include <QIODevice>
-#include <fstream>
 #include <QTimer>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -68,7 +67,6 @@ public:
     Q_PROPERTY(bool productTypeAdded READ productTypeAdded WRITE setProductTypeAdded NOTIFY productTypeAddedChanged)
     Q_PROPERTY(bool productStockAdded READ productStockAdded WRITE setProductStockAdded NOTIFY productStockAddedChanged)
     Q_PROPERTY(int versionInt READ versionInt WRITE setVersionInt NOTIFY versionIntChanged)
-    Q_PROPERTY(std::string logFileName READ logFileName WRITE setLogFileName NOTIFY logFileNameChanged)
     Q_PROPERTY(bool databaseLoaded READ databaseLoaded WRITE setDatabaseLoaded NOTIFY databaseLoadedChanged)
     Q_PROPERTY(QString databaseConnectionErrorString READ databaseConnectionErrorString WRITE setDatabaseConnectionErrorString NOTIFY databaseConnectionErrorStringChanged)
     Q_PROPERTY(bool isInternetConnected READ isInternetConnected WRITE setIsInternetConnected NOTIFY isInternetConnectedChanged)
@@ -83,9 +81,7 @@ public:
     Q_INVOKABLE void check4Update();
     Q_INVOKABLE void getSalesSummary(const int &ind);
     Q_INVOKABLE void installUpdate();
-    Q_INVOKABLE void logToFile(const QString &level, const QString &log);
     Q_INVOKABLE void openLocation(const QString &path);
-    // void logToFile(QString level, QString log);
 
     void setTabularData();
 
@@ -133,7 +129,6 @@ public:
 
     void emitDatabaseState(const bool &state, const QString &status);
 
-    std::string logFileName() const;
 
     bool databaseLoaded() const;
 
@@ -189,7 +184,6 @@ public slots:
     //
     void onNewVersionAvailable(const QJsonObject &json);
 
-    void setLogFileName(std::string logFileName);
 
     void setDatabaseLoaded(bool databaseLoaded);
 
@@ -255,7 +249,6 @@ signals:
     void downloadStarted();
     void salesSummaryCost(int cash,int mpesa,int cheque,int credit,int paid,int totals);
 
-    void logFileNameChanged(std::string logFileName);
     void databaseConnectionChanged(bool state, QString msg);
 
     void databaseLoadedChanged(bool databaseLoaded);
@@ -268,15 +261,11 @@ signals:
     void creditPaidYAxisChanged(QList<int> creditPaidYAxis);
 
 private slots:
-    void onLogsTimerTimeout();
-
     void onInternetConnectionStatusChanged(bool state);
     
     void onDatabaseConnectionError(const QString &errorMessage);
 
 private:
-    void initializeLogFileName();
-
     DatabaseInterface * m_databaseInterface;
     DateTime * m_dateTime;
     WebApiInterface * webInt;
@@ -289,13 +278,9 @@ private:
     QStringList m_plotXAxis;
     QList<int> m_cashYAxis, m_mpesaYAxis, m_creditYAxis, m_chequeYAxis;
     int m_plotYmax, m_versionInt;
-    bool m_tablesCreated, m_productsAdded, m_productTypeAdded, m_productStockAdded, m_logFileDayChanged = false;
+    bool m_tablesCreated, m_productsAdded, m_productTypeAdded, m_productStockAdded;
     QJsonObject m_UpdateJSON;
-    QString m_path, r_path, m_logsPath;
-    std::string m_logFileName;
-
-    std::ofstream logWriter;
-    QTimer * logsTimer;
+    QString m_path, r_path;
     bool m_databaseLoaded;
     QString m_databaseConnectionErrorString;
     bool m_isInternetConnected;
